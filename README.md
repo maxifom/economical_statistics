@@ -1,6 +1,7 @@
 # Economical Statistics project
 
 Current Trend Accuracy: 52.2% with linear regression
+
 History values are located in linreg.csv
 
 News from Jan 1 2017 to Mar 9 2019 from site finam.ru used
