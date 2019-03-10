@@ -1,3 +1,10 @@
+statsmodels
+sklearn
+scikit-learn
+pandas
+pytz
+pymorphy2
+polyglot
 asn1crypto==0.24.0
 attrs==19.1.0
 Automat==0.7.0

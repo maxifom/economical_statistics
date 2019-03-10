@@ -1,4 +1,7 @@
 version: '3'
+volumes:
+  mysql:
+    driver: local
 services:
   mysql:
     image: mysql:5.7.25
@@ -10,3 +13,5 @@ services:
       - MYSQL_ROOT_PASSWORD=root
     ports:
       - 3306:3306
+    volumes:
+      - mysql:/var/lib/mysql
