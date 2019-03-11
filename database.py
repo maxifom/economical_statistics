@@ -11,14 +11,15 @@ class Database:
         connection = MySQLdb.connect(host, 'user', 'user', 'economics', cursorclass=MySQLdb.cursors.DictCursor)
         self.connection = connection
         self.db = self.connection.cursor()
+        self.connection.encoding = 'utf-8'
         self.db.execute('''
             SET NAMES utf8;
             SET CHARACTER SET utf8;
             SET character_set_connection=utf8;
         ''')
-        if os.path.exists('./schema.sql'):
-            with open('./schema.sql', 'r') as schema:
-                self.db.execute(schema.read().replace('\n', ''))
+        # if os.path.exists('./schema.sql'):
+        #     with open('./schema.sql', 'r', encoding='utf-8') as schema:
+        #         self.db.execute(schema.read().replace('\n', ''))
 
     def insert_companies(self, given_companies):
         self.db.execute("""
