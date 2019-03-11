@@ -1,3 +1,4 @@
+requests
 statsmodels
 sklearn
 scikit-learn

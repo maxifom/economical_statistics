@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 import MySQLdb
@@ -6,7 +7,8 @@ import MySQLdb.cursors
 
 class Database:
     def __init__(self):
-        connection = MySQLdb.connect('localhost', 'user', 'user', 'economics', cursorclass=MySQLdb.cursors.DictCursor)
+        host = os.getenv("MYSQL_HOST", "localhost")
+        connection = MySQLdb.connect(host, 'user', 'user', 'economics', cursorclass=MySQLdb.cursors.DictCursor)
         self.connection = connection
         self.db = self.connection.cursor()
         self.db.execute('''
@@ -14,8 +16,9 @@ class Database:
             SET CHARACTER SET utf8;
             SET character_set_connection=utf8;
         ''')
-        with open('schema.sql', 'r') as schema:
-            self.db.execute(schema.read().replace('\n', ''))
+        if os.path.exists('./schema.sql'):
+            with open('./schema.sql', 'r') as schema:
+                self.db.execute(schema.read().replace('\n', ''))
 
     def insert_companies(self, given_companies):
         self.db.execute("""

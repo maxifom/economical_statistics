@@ -66,7 +66,7 @@ class FinamNewsSpider(scrapy.Spider):
         body_str = ''
         for text in body:
             body_str += text.replace('\xa0', ' ')
-        time = response.xpath('//*[@class="f-newsitem"][1]/div[2]/text()').extract_first().rstrip('\xa0')
+        time = response.xpath('//*[@class="sm lightgrey mb20 mt15"][1]/text()').extract_first().rstrip('\xa0')
         tz = pytz.timezone("Europe/Moscow")
         timestamp = int(tz.localize(datetime.strptime(time, "%d.%m.%Y %H:%M"), is_dst=0).timestamp())
         n = dict()
