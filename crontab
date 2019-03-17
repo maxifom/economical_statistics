@@ -1,0 +1,1 @@
+*/5 * * * 1-5 python3 /usr/src/app/update_prices.py

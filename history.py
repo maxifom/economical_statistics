@@ -116,7 +116,7 @@ def get_news_history():
 
 if __name__ == '__main__':
     pass
-    # get_news_history()
+    # print(get_news_history())
 
     # for n in news:
     #     if len(n["companies"]) == 1:
