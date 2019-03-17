@@ -9,3 +9,20 @@ Economical statistics project
 
 # TODO
 1. Real-Time analysis
+
+### History build steps:
+1. finam_news_parser.py + moex_history_parser.py (News + MOEX candle history)
+2. sentiment_analysis.py (Add sentiment scores to news)
+3. companies_extractor.py (Add extracted companies to news)
+4. linreg_params_final.py (Calculate all historical params for linreg calculation)
+5. linreg_coef_final.py (Calculate linreg coefficients + pvalues) -> companies.pickle
+
+### File index
+* history_{company_ticker}_1 - 1 minutes candle history
+* history_{company_ticker}_24 - 1 day candle history
+* all_parsed_news.csv - all parsed news w/o sent scores and companies
+* all_parsed_news_with_sentiment_scores.csv - all parsed news with sentiment scores and w/o companies
+* news_with_one_company.csv - all parsed news where EXACTLY ONE company exists
+* news_with_one_or_more_company.csv - all parsed news where ONE OR MORE companies exist
+* parsed_{company_ticker} - Calculated historical parameters for linreg
+* companies.pickle - dump of companies list, containing ticker, name, linreg coefs and pvalues
