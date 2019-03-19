@@ -30,7 +30,7 @@ Economical statistics project
 * companies.pickle - dump of companies list, containing ticker, name, linreg coefs and pvalues
 
 To run full stack app with mysql database, visualization
-and real-time news and prices parsing (Take about 2GB space):
+and real-time news and prices parsing (Take about 2.5GB space):
 ```sh
 docker-compose up -d
 ```
