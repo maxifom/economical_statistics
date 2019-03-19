@@ -1,0 +1,28 @@
+{% extends "template.html" %}
+{% block title %}
+    {% if news |length >1 %}
+        News
+    {% else %}
+        News # {{ news[0]["id"] }}
+    {% endif %}
+{% endblock %}
+{% block body %}
+    {% if news |length >1 %}
+        <h1>News:</h1>
+    {% endif %}
+    {% for n in news %}
+        <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
+            {% if news |length >1 %}
+                <a href='/news/{{ n["id"] }}'><h2>News # {{ n["id"] }} </h2></a>
+                <a href="/companies/{{ n['c_id'] }}"><h5>{{ n["company"] }}</h5></a>
+            {% else %}
+                <a href="/companies/{{ n['c_id'] }}"><h2>News for {{ n["company"] }}</h2></a>
+            {% endif %}
+            {% if n["time"] %}
+                <h5>News time: {{ n["time"] }} UTC</h5>
+                <p><a href="{{ n['link'] }}">Link</a> {{ n['sent_score'] }} {{ n['word_count'] }}words</p>
+                <p>{{ n["body"] }}</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,42 @@
+version: '3'
+networks:
+  pma:
+    external:
+      name: default_overlay
+  backend:
+    driver: bridge
+volumes:
+  mysql:
+    driver: local
+services:
+  mysql_economics:
+    image: mysql:5.7.25
+    restart: always
+    networks:
+      - pma
+      - backend
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    volumes:
+      - ./docker/mysql/conf.d:/etc/mysql/conf.d
+      - mysql:/var/lib/mysql
+      - ./docker/mysql/start_scripts:/docker-entrypoint-initdb.d
+  app:
+    build: .
+    volumes:
+      - ./python:/usr/src/app/python
+    tty: true
+    environment:
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_HOST=mysql_economics
+    depends_on:
+      - mysql_economics
+    networks:
+      - backend
+    ports:
+      - 80:5000

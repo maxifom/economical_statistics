@@ -1,0 +1,2 @@
+*/5 4-18 * * 1-5 cd /usr/src/app/python &&  /usr/local/bin/python ./update_prices.py >> /var/log/cron.log
+*/2 * * * 1-5 cd /usr/src/app/python &&  /usr/local/bin/python ./update_news.py >> /var/log/cron.log

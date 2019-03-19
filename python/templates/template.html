@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Economical statistics | {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,700|PT+Sans:400,700" rel="stylesheet"><style>
+        html, body {
+            font-family: 'Nunito', 'PT Sans', sans-serif;
+            font-weight: 400;
+        }
+
+        h1, h2, thead {
+            font-weight: 700;
+        }
+    </style>
+    {% block head %}
+
+    {% endblock %}
+</head>
+<body>
+
+<ul class="nav justify-content-center" style="border-bottom: 1px solid lightblue">
+    <li class="nav-item">
+        <span class="nav-link">Economical Statistics</span>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="/companies">Companies</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="/news">News</a>
+    </li>
+</ul>
+
+<div class="container">
+    {% block body %}
+    {% endblock %}
+</div>
+</body>
+</html>

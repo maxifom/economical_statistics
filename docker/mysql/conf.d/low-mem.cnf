@@ -1,0 +1,4 @@
+[mysqld]
+performance_schema=off
+default-storage-engine=MyISAM
+skip-innodb

@@ -7,7 +7,7 @@ chardet==3.0.4
 constantly==15.1.0
 cryptography==2.6.1
 cssselect==1.0.3
-futures==3.2.0
+futures==3.1.1
 hyperlink==18.0.0
 idna==2.8
 incremental==17.5.0
@@ -17,7 +17,7 @@ numpy==1.16.2
 pandas==0.24.2
 parsel==1.5.1
 patsy==0.5.1
-polyglot==16.7.4
+git+https://github.com/aboSamoor/polyglot.git@master
 pyasn1==0.4.5
 pyasn1-modules==0.2.4
 pycld2==0.31
@@ -39,3 +39,5 @@ Twisted==18.9.0
 urllib3==1.24.1
 w3lib==1.20.0
 zope.interface==4.6.0
+mysqlclient
+flask
