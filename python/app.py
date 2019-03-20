@@ -32,11 +32,14 @@ def companies(company=None):
 @app.route("/news/<n>")
 def news(n=None):
     db = Database()
+    words = None
     if n is None:
         ns = db.get_all_news()
     else:
         ns = db.get_news_by_id(n)
-    return render_template('news.html', news=ns)
+        with open('./../data/news_' + str(n) + '_words', 'rb') as f:
+            words = pickle.load(f)
+    return render_template('news.html', news=ns, words=words)
 
 
 if __name__ == '__main__':

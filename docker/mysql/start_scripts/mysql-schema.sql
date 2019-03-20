@@ -29,7 +29,8 @@ create table if not exists economics.news
   overnight_variation   decimal(15, 8) null,
   trading_day_variation decimal(15, 8) null,
   closing_price         decimal(15, 8) null,
-  seen                  tinyint(1)     not null default '0'
+  seen                  tinyint(1)     not null default '0',
+  parsed                tinyint(1)     not null default '0'
 ) collate = utf8_unicode_ci;
 create table if not exists economics.prices
 (

@@ -29,7 +29,7 @@
         </div>
     {% endfor %}
     {% if companies[0]["news"]|length > 0 %}
-        <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
+        <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue; max-height:400px; overflow-y: scroll;">
             <h3>News:</h3>
             {% for n in companies[0]["news"] %}
                 <a href="/news/{{ n["id"] }}"><h5>News # {{ n["id"] }}</h5></a>

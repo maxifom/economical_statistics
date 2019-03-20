@@ -25,4 +25,29 @@
             {% endif %}
         </div>
     {% endfor %}
+    {% if words %}
+        <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
+            <h3>Words:</h3>
+            <table class="table table-bordered table-striped table-responsive">
+                <thead>
+                <tr>
+                    <td>Word</td>
+                    <td>Score</td>
+                </tr>
+                </thead>
+                <tbody>
+                {% for w in words %}
+                    {% if w["polarity"]|float !=0 %}
+                        <tr>
+                            <td>{{ w }}</td>
+                            <td>{{ w["polarity"] }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
 {% endblock %}

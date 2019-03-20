@@ -1,6 +1,6 @@
 import os
 from polyglot.text import Text
-
+from parse_words_from_news import parse_news
 from database import Database
 import pytz
 import scrapy
@@ -46,6 +46,7 @@ class FinamNewsSpider(scrapy.Spider):
         tz = pytz.timezone("Europe/Moscow")
         timestamp = int(tz.localize(datetime.strptime(time, "%d.%m.%Y %H:%M"), is_dst=0).timestamp())
         n = dict()
+        body_str = body_str.replace('.', '. ')
         n["text"] = title + '. ' + body_str
         n["url"] = response.url
         n["timestamp"] = timestamp
@@ -170,4 +171,5 @@ if __name__ == '__main__':
             db.connection.commit()
         # analysis.calculate_predictions(news_to_update)
     update_actual_on_news()
+    parse_news()
     print('news updated')
