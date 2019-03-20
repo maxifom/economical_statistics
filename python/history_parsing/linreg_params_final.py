@@ -8,8 +8,8 @@ import pytz
 if __name__ == '__main__':
     tickers = ["SFIN", "FIVE", "ALRS", "AFLT", "VTBR", "GAZP", "PIKK", "DSKY", "IRAO", "LKOH", "MVID", "MGNT", "MFON",
                "MTLR", "CBOM", "MAGN", "MOEX", "MTSS", "NLMK", "NMTP", "NVTK", "GMKN", "UWGN", "POLY", "PLZL", "AGRO",
-               "ROSN", "RSTI", "RTKM", "RUAL", "HYDR", "RNFT", "SBER", "SBERP", "CHMF", "AFKS", "SNGS", "SNGSP", "TATN",
-               "TATNP", "TRMK", "TRNFP", "PHOR", "FEES", "UPRO", "YNDX"]
+               "ROSN", "RSTI", "RTKM", "RUAL", "HYDR", "RNFT", "SBER", "CHMF", "AFKS", "SNGS",  "TATN",
+                "TRMK", "TRNFP", "PHOR", "FEES", "UPRO", "YNDX"]
     all_news = pd.read_csv('./csv/news_with_one_company.csv')
     tz = pytz.timezone("Europe/Moscow")
     for t in tickers:
