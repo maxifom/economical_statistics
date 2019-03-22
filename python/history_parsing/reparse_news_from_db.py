@@ -26,7 +26,8 @@ def parse_news():
         #     words_with_polarity.append(w)
         with open('./../../data/news_' + str(n["id"]) + '_words', 'wb') as f:
             pickle.dump(info, f)
-        db.db.execute("""UPDATE news SET sent_score = %s WHERE id = %s""", (info["sent_score"], n["id"]))
+        db.db.execute("""UPDATE news SET sent_score = %s, word_count = %s WHERE id = %s""",
+                      (info["sent_score"], info["word_count"], n["id"]))
     db.db.execute("UPDATE news SET parsed = 1")
     db.connection.commit()
 

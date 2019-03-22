@@ -29,6 +29,7 @@ def sentence_info(sentence):
             c += 1
             if c > 5:
                 break
+    print(first_sentence)
     sentence = '.'.join(splitted[1:])
     sentence = sentence.replace('.', ' ').replace(',', ' ').replace('\n', '').replace('\t', '').lstrip(' ').rstrip(
         ' ').replace('"', '').replace('  ', ' ')

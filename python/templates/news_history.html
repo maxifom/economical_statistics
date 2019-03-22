@@ -4,9 +4,15 @@
 {% endblock %}
 {% block body %}
     <div style="display: flex; justify-content: start">
-        <a style="margin-right:20px" href="/history/{{ page - 1 }}">Prev</a>
+        {% if page > 10 %}
+            <a style="margin-right:20px" href="/history/{{ page - 10 }}">Prev 10</a>
+        {% endif %}
+        {% if page > 1 %}
+            <a style="margin-right:20px" href="/history/{{ page - 1 }}">Prev</a>
+        {% endif %}
         <h4 style="margin-right:20px">Page # {{ page }}</h4>
-        <a href="/history/{{ page + 1 }}">Next</a>
+        <a style="margin-right:20px" href="/history/{{ page + 1 }}">Next</a>
+        <a href="/history/{{ page + 10 }}">Next 10</a>
     </div>
     <h2>News history</h2>
     {% for n in news %}
@@ -51,9 +57,15 @@
             </div>
         {% endif %}
     {% endfor %}
-<div style="display: flex; justify-content: start">
-        <a style="margin-right:20px" href="/history/{{ page - 1 }}">Prev</a>
+    <div style="display: flex; justify-content: start">
+        {% if page > 10 %}
+            <a style="margin-right:20px" href="/history/{{ page - 10 }}">Prev 10</a>
+        {% endif %}
+        {% if page > 1 %}
+            <a style="margin-right:20px" href="/history/{{ page - 1 }}">Prev</a>
+        {% endif %}
         <h4 style="margin-right:20px">Page # {{ page }}</h4>
-        <a href="/history/{{ page + 1 }}">Next</a>
+        <a style="margin-right:20px" href="/history/{{ page + 1 }}">Next</a>
+        <a href="/history/{{ page + 10 }}">Next 10</a>
     </div>
 {% endblock %}
