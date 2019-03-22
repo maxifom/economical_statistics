@@ -19,7 +19,8 @@ def sentence_info(sentence):
     words = list()
     splitted = sentence.split('.')
     first_sentence = splitted[0]
-    first_sentence = first_sentence.replace('.', ' ').replace(',', ' ').replace('\n', '').replace('\t', '').lstrip(' ').rstrip(
+    first_sentence = first_sentence.replace('.', ' ').replace(',', ' ').replace('\n', '').replace('\t', '').lstrip(
+        ' ').rstrip(
         ' ').replace('"', '').replace('  ', ' ')
     first_sentence = first_sentence.split(' ')
     for i in range(len(first_sentence)):
@@ -42,7 +43,7 @@ def sentence_info(sentence):
                 break
     result = dict()
     result["word_count"] = len(sentence) + len(first_sentence)
-    result["sentence"] = ' '.join(sentence)
+    result["sentence"] = ' '.join(first_sentence) + ' '.join(sentence)
     positives = 0
     negatives = 0
     # title
@@ -117,10 +118,6 @@ def sentence_info(sentence):
         if "word" in _p:
             words.append(_p)
 
-
-
-
-
     # Text
     for p in positive:
         words_to_delete = []
@@ -192,7 +189,7 @@ def sentence_info(sentence):
         words_to_delete = []
         if "word" in _p:
             words.append(_p)
-    if positives - negatives != 0:
+    if positives + negatives != 0:
         result["sent_score"] = (positives - negatives) / (positives + negatives)
     else:
         result["sent_score"] = 0

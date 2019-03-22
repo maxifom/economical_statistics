@@ -42,7 +42,7 @@ def sentence_info(sentence):
                 break
     result = dict()
     result["word_count"] = len(sentence) + len(first_sentence)
-    result["sentence"] = ' '.join(sentence)
+    result["sentence"] = ' '.join(first_sentence) + ' '.join(sentence)
     positives = 0
     negatives = 0
     # title
@@ -192,7 +192,7 @@ def sentence_info(sentence):
         words_to_delete = []
         if "word" in _p:
             words.append(_p)
-    if positives - negatives != 0:
+    if positives + negatives != 0:
         result["sent_score"] = (positives - negatives) / (positives + negatives)
     else:
         result["sent_score"] = 0
