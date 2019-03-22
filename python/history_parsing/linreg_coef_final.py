@@ -5,12 +5,12 @@ import pandas as pd
 
 
 def calculate_percent_true():
-    with open('companies.pickle', 'rb') as f:
+    with open('./../../data/companies.pickle', 'rb') as f:
         tickers = pickle.load(f)
     max_ = 0
     min_ = 100
     for t in tickers:
-        df = pd.read_csv('./csv/parsed_{0}.csv'.format(t["ticker"]))
+        df = pd.read_csv('./../../data/parsed_{0}.csv'.format(t["ticker"]))
         df_dict = df.to_dict(orient='rows')
         tr = 0
         fals = 0
@@ -76,7 +76,7 @@ def calculate_linreg_coef_and_pvalues():
                {'name': 'Юнипро', 'ticker': 'UPRO', 'parse_name': 'Юнипро'},
                {'name': 'Яндекс', 'ticker': 'YNDX', 'parse_name': 'Яндекс'}]
     for t in tickers:
-        df = pd.read_csv('./csv/parsed_{0}.csv'.format(t["ticker"]))
+        df = pd.read_csv('./../../data/parsed_{0}.csv'.format(t["ticker"]))
         df = df.dropna()
         x = df.iloc[:, 1:-2]
         y = df.iloc[:, -2]
@@ -88,7 +88,7 @@ def calculate_linreg_coef_and_pvalues():
         # print(p)
         t["coef"] = p.to_dict()
         t["pvalues"] = res.pvalues.to_dict()
-    with open('companies.pickle', 'wb') as companies_file:
+    with open('./../../data/companies.pickle', 'wb') as companies_file:
         pickle.dump(tickers, companies_file)
 
 

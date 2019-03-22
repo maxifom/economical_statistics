@@ -1,0 +1,59 @@
+{% extends "template.html" %}
+{% block title %}
+    News history
+{% endblock %}
+{% block body %}
+    <div style="display: flex; justify-content: start">
+        <a style="margin-right:20px" href="/history/{{ page - 1 }}">Prev</a>
+        <h4 style="margin-right:20px">Page # {{ page }}</h4>
+        <a href="/history/{{ page + 1 }}">Next</a>
+    </div>
+    <h2>News history</h2>
+    {% for n in news %}
+        <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
+            <h4>News # {{ n["id"] }}</h4>
+            <h5>{{ n["companies"] }}</h5>
+            {% if n["timestamp"] %}
+                <p><a href="{{ n['url'] }}">Link</a> {{ n['sent_score'] }} {{ n['word_count'] }}words
+                </p>
+                <p>{{ n["text"] }}</p>
+            {% endif %}
+            {% if n["info"]["sentence"] %}
+                <p>
+                    Parsed view: {{ n["info"]["sentence"] }}
+                </p>
+            {% endif %}
+        </div>
+        {% if n["info"]["words"] %}
+            <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
+                <h3>Words:</h3>
+                <table class="table table-bordered table-striped table-responsive">
+                    <thead>
+                    <tr>
+                        <td>Word</td>
+                        <td>Score</td>
+                        <td>Count</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for w in n["info"]["words"] %}
+                        {% if w["score"]|float !=0 %}
+                            <tr>
+                                <td>{{ w["word"] }}</td>
+                                <td>{{ w["score"] }}</td>
+                                <td>{{ w["count"] }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    {% endfor %}
+<div style="display: flex; justify-content: start">
+        <a style="margin-right:20px" href="/history/{{ page - 1 }}">Prev</a>
+        <h4 style="margin-right:20px">Page # {{ page }}</h4>
+        <a href="/history/{{ page + 1 }}">Next</a>
+    </div>
+{% endblock %}

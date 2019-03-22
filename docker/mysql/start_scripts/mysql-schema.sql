@@ -44,6 +44,13 @@ create table if not exists economics.prices
   volume_previous bigint                              null,
   time            timestamp default CURRENT_TIMESTAMP not null
 ) collate = utf8_unicode_ci;
+CREATE TABLE IF NOT EXISTS economics.words (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  word varchar(255) NOT NULL,
+  is_positive tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (id),
+  UNIQUE KEY word (word)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE = utf8_unicode_ci;
 INSERT IGNORE INTO economics.companies (id, name, full_name, parse_name, ticker, url)
 VALUES (1, 'Safmar Fin', 'Safmar Finansovye Investitsii PAO', 'Сафмар, Safmar', 'SFIN',
         'https://ru.investing.com/equities/yevroplan-pao');

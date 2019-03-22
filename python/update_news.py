@@ -7,6 +7,7 @@ import scrapy
 from scrapy.crawler import CrawlerProcess
 import logging
 from datetime import datetime
+from analysis import sentence_info
 
 news = list()
 
@@ -89,19 +90,6 @@ def update_actual_on_news():
         db.connection.commit()
 
 
-def get_sentence_info(txt):
-    d = dict()
-    d['sent_score'] = 0
-    d['word_count'] = 0
-    word_count = 0
-    text = Text(text=txt.encode('utf-8'), hint_language_code='ru')
-    for key, c in text.word_counts.items():
-        word_count += c
-    d['sent_score'] = text.polarity
-    d['word_count'] = word_count
-    return d
-
-
 def extract_company(news):
     db = Database()
     parse_names = db.get_all_companies()
@@ -158,7 +146,7 @@ if __name__ == '__main__':
                 news_to_update.append(n)
     if len(news_to_update) > 0:
         for n in news_to_update:
-            n["info"] = get_sentence_info(n["text"])
+            n["info"] = sentence_info(n["text"])
         news_to_update = extract_company(news_to_update)
         db = Database()
         print(news_to_update)

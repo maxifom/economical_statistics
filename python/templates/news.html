@@ -25,7 +25,12 @@
             {% endif %}
         </div>
     {% endfor %}
-    {% if words %}
+    {% if info["sentence"] %}
+        <p>
+            Parsed view: {{ info["sentence"] }}
+        </p>
+    {% endif %}
+    {% if info["words"] %}
         <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
             <h3>Words:</h3>
             <table class="table table-bordered table-striped table-responsive">
@@ -33,14 +38,16 @@
                 <tr>
                     <td>Word</td>
                     <td>Score</td>
+                    <td>Count</td>
                 </tr>
                 </thead>
                 <tbody>
-                {% for w in words %}
-                    {% if w["polarity"]|float !=0 %}
+                {% for w in info["words"] %}
+                    {% if w["score"]|float !=0 %}
                         <tr>
-                            <td>{{ w }}</td>
-                            <td>{{ w["polarity"] }}</td>
+                            <td>{{ w["word"] }}</td>
+                            <td>{{ w["score"] }}</td>
+                            <td>{{ w["count"] }}</td>
                         </tr>
                     {% endif %}
                 {% endfor %}

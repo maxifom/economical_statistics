@@ -41,3 +41,5 @@ w3lib==1.20.0
 zope.interface==4.6.0
 mysqlclient
 flask
+pymorphy2==0.8
+pymorphy2-dicts==2.4.393442.3710985

@@ -5,16 +5,17 @@ import pandas as pd
 from datetime import datetime as date
 import pytz
 
-if __name__ == '__main__':
+
+def calculate_params():
     tickers = ["SFIN", "FIVE", "ALRS", "AFLT", "VTBR", "GAZP", "PIKK", "DSKY", "IRAO", "LKOH", "MVID", "MGNT", "MFON",
                "MTLR", "CBOM", "MAGN", "MOEX", "MTSS", "NLMK", "NMTP", "NVTK", "GMKN", "UWGN", "POLY", "PLZL", "AGRO",
-               "ROSN", "RSTI", "RTKM", "RUAL", "HYDR", "RNFT", "SBER", "CHMF", "AFKS", "SNGS",  "TATN",
-                "TRMK", "TRNFP", "PHOR", "FEES", "UPRO", "YNDX"]
-    all_news = pd.read_csv('./csv/news_with_one_company.csv')
+               "ROSN", "RSTI", "RTKM", "RUAL", "HYDR", "RNFT", "SBER", "CHMF", "AFKS", "SNGS", "TATN",
+               "TRMK", "TRNFP", "PHOR", "FEES", "UPRO", "YNDX"]
+    all_news = pd.read_csv('./../../data/news_with_one_company_sent_scores.csv')
     tz = pytz.timezone("Europe/Moscow")
     for t in tickers:
-        minutely_history = pd.read_csv('./csv/history_{0}_1.csv'.format(t))
-        daily_history = pd.read_csv('./csv/history_{0}_24.csv'.format(t))
+        minutely_history = pd.read_csv('./../../data/history_{0}_1.csv'.format(t))
+        daily_history = pd.read_csv('./../../data/history_{0}_24.csv'.format(t))
         daily_history_dict = daily_history.to_dict(orient='rows')
         prev_close = 0
         index = 0
@@ -42,7 +43,11 @@ if __name__ == '__main__':
             prev_close = float(d["close"])
             index += 1
         new_df = pd.DataFrame.from_dict(daily_history_dict).reset_index(drop=True)
-        new_df.to_csv('./csv/parsed_{0}.csv'.format(t),
+        new_df.to_csv('./../../data/parsed_{0}.csv'.format(t),
                       columns=['sent_score', 'log_return', 'volume', 'overnight_variation',
                                'trading_day_variation', 'word_count', 'close',
                                'next_closing_price', 'time'])
+
+
+if __name__ == '__main__':
+    calculate_params()

@@ -1,6 +1,7 @@
 import pandas as pd
 
-if __name__ == '__main__':
+
+def extract_companies():
     parse_names = [{'ticker': 'SFIN', 'parse_name': 'Сафмар, Safmar'}, {'ticker': 'FIVE', 'parse_name': 'X5'},
                    {'ticker': 'ALRS', 'parse_name': 'Алроса'}, {'ticker': 'AFLT', 'parse_name': 'Аэрофлот'},
                    {'ticker': 'VTBR', 'parse_name': 'ВТБ, Втб'}, {'ticker': 'GAZP', 'parse_name': 'Газпром'},
@@ -19,7 +20,8 @@ if __name__ == '__main__':
                    {'ticker': 'ROSN', 'parse_name': 'Роснефть'}, {'ticker': 'RSTI', 'parse_name': 'Россети'},
                    {'ticker': 'RTKM', 'parse_name': 'Ростелеком'}, {'ticker': 'RUAL', 'parse_name': 'Русал'},
                    {'ticker': 'HYDR', 'parse_name': 'РусГидро'}, {'ticker': 'RNFT', 'parse_name': 'РуссНефть'},
-                   {'ticker': 'SBER', 'parse_name': 'Сбербанк'}, {'ticker': 'CHMF', 'parse_name': 'Северсталь'}, {'ticker': 'AFKS', 'parse_name': 'АФК Система'},
+                   {'ticker': 'SBER', 'parse_name': 'Сбербанк'}, {'ticker': 'CHMF', 'parse_name': 'Северсталь'},
+                   {'ticker': 'AFKS', 'parse_name': 'АФК Система'},
                    {'ticker': 'SNGS', 'parse_name': 'Сургутнефтегаз'}, {'ticker': 'TATN', 'parse_name': 'Татнефть'},
                    {'ticker': 'TRMK', 'parse_name': 'ТМК'},
                    {'ticker': 'TRNFP', 'parse_name': 'Транснефть'}, {'ticker': 'PHOR', 'parse_name': 'ФосАгро'},
@@ -27,7 +29,7 @@ if __name__ == '__main__':
                    {'ticker': 'YNDX', 'parse_name': 'Яндекс'}]
     for p in parse_names:
         p['parse_name'] = p['parse_name'].split(', ')
-    df = pd.read_csv('./csv/all_parsed_news_with_sentiment_scores.csv')
+    df = pd.read_csv('./../../data/all_parsed_news.csv')
     df_dict = df.to_dict(orient='rows')
     news_with_one_company = list()
     news_with_one_plus_company = list()
@@ -44,8 +46,14 @@ if __name__ == '__main__':
         if len(d["companies"]) > 0:
             news_with_one_plus_company.append(d)
     one_company_df = pd.DataFrame(news_with_one_company,
-                                  columns=['companies', 'sent_score', 'text', 'timestamp', 'url', 'word_count']).sort_values(by="timestamp").reset_index(drop=True)
+                                  columns=['companies', 'text', 'timestamp', 'url']).sort_values(
+        by="timestamp").reset_index(drop=True)
     one_company_plus_df = pd.DataFrame(news_with_one_plus_company,
-                                       columns=['companies', 'sent_score', 'text', 'timestamp', 'url', 'word_count']).sort_values(by="timestamp").reset_index(drop=True)
-    one_company_df.to_csv('./csv/news_with_one_company.csv')
-    one_company_plus_df.to_csv('./csv/news_with_one_or_more_company.csv')
+                                       columns=['companies', 'text', 'timestamp', 'url']).sort_values(
+        by="timestamp").reset_index(drop=True)
+    one_company_df.to_csv('./../../data/news_with_one_company.csv')
+    one_company_plus_df.to_csv('./../../data/news_with_one_or_more_company.csv')
+
+
+if __name__ == '__main__':
+    extract_companies()
