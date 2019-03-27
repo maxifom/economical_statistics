@@ -6,7 +6,7 @@ from linreg_coef_final import calculate_linreg_coef_and_pvalues
 from linreg_params_final import calculate_params
 from sentiment_analysis import sentiment_companies
 from reparse_news_from_db import parse_news
-
+from true_percent import calculate_percent_true
 
 def reparse():
     try:
@@ -25,6 +25,9 @@ def reparse():
         print(datetime.now() - time)
         print("Reparsing db news")
         parse_news()
+        print(datetime.now() - time)
+        print("Calculate percent true")
+        calculate_percent_true()
         print(datetime.now() - time)
     except Exception:
         print("e")

@@ -64,6 +64,30 @@
                 </form>
             {% endif %}
         </h1>
-
     </div>
+
+
+    {% if percents %}
+        <h3>{{ "%.1f"|format(percents["min"]*100) }}% - {{ "%.1f"|format(percents["max"]*100) }}%</h3>
+        <table class="table table-responsive table-sm table-striped">
+            <thead>
+            <tr>
+                <td>Ticker</td>
+                <td>True</td>
+                <td>False</td>
+                <td>Percent</td>
+            </tr>
+            </thead>
+            <tbody>
+            {% for p in percents["values"] %}
+                <tr>
+                    <td>{{ p["ticker"] }}</td>
+                    <td>{{ p["true"] }}</td>
+                    <td>{{ p["false"] }}</td>
+                    <td title="{{ p['percent']*100 }}">{{ "%.1f"|format(p["percent"]*100) }}%</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 {% endblock %}

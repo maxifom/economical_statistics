@@ -27,8 +27,14 @@ def companies(company=None):
         cs = db.get_company_by_id_with_price(company)
         with open('./../data/companies.pickle', 'rb') as f:
             companies = pickle.load(f)
-        coefs = companies[cs[0]["id"] - 1]["coef"]
-        pvalues = companies[cs[0]["id"] - 1]['pvalues']
+        l = list(filter(lambda c: c["ticker"] == cs[0]["ticker"], companies))
+        if len(l) > 0:
+            c = l[0]
+            coefs = c["coef"]
+            pvalues = c['pvalues']
+        else:
+            coefs = None
+            pvalues = None
     return render_template('companies.html', companies=cs, coefs=coefs, pvalues=pvalues)
 
 
@@ -59,6 +65,11 @@ def dict():
             negative_from_txt('./negative.txt')
         return redirect('/dict')
     else:
+        percents = None
+        if os.path.exists('./../data/result.pickle'):
+            with open('./../data/result.pickle', 'rb') as f:
+                percents = pickle.load(f)
+        percents['values'] = sorted(percents['values'], key=lambda p: p["percent"])
         db = Database()
         db.db.execute("""
             SELECT * FROM words ORDER BY id DESC
@@ -72,7 +83,7 @@ def dict():
                     status = 'not parsing'
         else:
             status = 'not parsing'
-        return render_template('dict.html', dict=dict, status=status)
+        return render_template('dict.html', dict=dict, status=status, percents=percents)
 
 
 @app.route("/delete", methods=["POST"])

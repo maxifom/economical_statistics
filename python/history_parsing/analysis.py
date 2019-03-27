@@ -42,7 +42,7 @@ def sentence_info(sentence):
                 break
     result = dict()
     result["word_count"] = len(sentence) + len(first_sentence)
-    result["sentence"] = ' '.join(first_sentence) + ' '.join(sentence)
+    result["sentence"] = ' '.join(first_sentence) + ' ' + ' '.join(sentence)
     positives = 0
     negatives = 0
     # title
