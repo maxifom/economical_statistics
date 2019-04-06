@@ -5,6 +5,9 @@ networks:
       name: default_overlay
   backend:
     driver: bridge
+  proxy:
+    external: 
+      name: proxy
 volumes:
   mysql:
     driver: local
@@ -13,7 +16,7 @@ services:
     image: mysql:5.7.25
     restart: always
     networks:
-      - pma
+      - proxy
       - backend
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -40,3 +43,11 @@ services:
       - backend
     ports:
       - 80:5000
+ #     - proxy
+ #   labels:
+ #     traefik.enable: "true"
+ #     traefik.port: "5000"
+ #     traefik.frontend.passHostHeader: true
+ #     traefik.frontend.rule: "Host:economics.maxifom.com"
+ #     traefik.frontend.whiteList.useXForwardedFor: "true"
+ #     traefik.docker.network: "proxy"
