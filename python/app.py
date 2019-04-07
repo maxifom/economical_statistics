@@ -7,7 +7,6 @@ from database import Database
 from add_to_dictionary import *
 from analysis import sentence_info
 
-
 app = Flask(__name__)
 
 
@@ -143,13 +142,24 @@ def predictions():
     predictions = list()
     for c in companies:
         db.db.execute("""
-            SELECT predictions.prediction,time,current, updated_at,predictions.id,companies.name FROM predictions INNER JOIN companies ON predictions.company_id = companies.id WHERE predictions.company_id=%s ORDER BY predictions.id DESC LIMIT 1  
+            SELECT predictions.prediction,actual,time,current, updated_at,predictions.id,companies.name FROM predictions INNER JOIN companies ON predictions.company_id = companies.id WHERE predictions.company_id=%s ORDER BY predictions.id DESC LIMIT 1  
         """, (c["id"],))
         prediction = db.db.fetchone()
         if prediction is None:
             continue
         prediction["trend"] = float(prediction["prediction"]) > float(prediction["current"])
         predictions.append(prediction)
+        db.db.execute("""
+            SELECT prediction, actual, current FROM predictions WHERE company_id = %s AND actual != 0
+        """, (c["id"],))
+        d = db.db.fetchall()
+        prediction["count"] = len(d)
+        prediction["true"] = 0
+        for _d in d:
+            first = _d["prediction"] > _d["current"]
+            second = _d["actual"] > _d["current"]
+            if first == second:
+                prediction["true"] += 1
     return render_template("predictions.html", predictions=predictions)
 
 
@@ -159,7 +169,7 @@ def all_predictions(page=0):
     page = int(page)
     db = Database()
     db.db.execute("""
-            SELECT predictions.prediction,current,time,updated_at,predictions.id,companies.name, companies.id as c_id FROM predictions INNER JOIN companies ON predictions.company_id = companies.id ORDER BY predictions.id DESC LIMIT %s OFFSET %s  
+            SELECT predictions.prediction,actual,current,time,updated_at,predictions.id,companies.name, companies.id as c_id FROM predictions INNER JOIN companies ON predictions.company_id = companies.id ORDER BY predictions.id DESC LIMIT %s OFFSET %s  
         """, (10, 10 * int(page)))
     predictions = db.db.fetchall()
     if predictions is None:
@@ -168,11 +178,13 @@ def all_predictions(page=0):
         predictions[i]["trend"] = float(predictions[i]["prediction"]) > float(predictions[i]["current"])
     return render_template("all_predictions.html", predictions=predictions, page=page)
 
+
 @app.route('/predict')
 def predict():
     from parse import predict
     predict()
     return redirect('/predictions')
+
 
 @app.route('/prediction/<id>')
 def prediction(id):
