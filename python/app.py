@@ -7,6 +7,7 @@ from database import Database
 from add_to_dictionary import *
 from analysis import sentence_info
 
+
 app = Flask(__name__)
 
 
@@ -132,6 +133,69 @@ def history(page=0):
         ns[i]["info"] = sentence_info(ns[i]["text"])
         ns[i]["id"] = page * 10 + i
     return render_template("news_history.html", news=ns, page=page)
+
+
+@app.route('/predictions')
+def predictions():
+    db = Database()
+    db.db.execute("""SELECT * FROM companies""")
+    companies = db.db.fetchall()
+    predictions = list()
+    for c in companies:
+        db.db.execute("""
+            SELECT predictions.prediction,time,current, updated_at,predictions.id,companies.name FROM predictions INNER JOIN companies ON predictions.company_id = companies.id WHERE predictions.company_id=%s ORDER BY predictions.id DESC LIMIT 1  
+        """, (c["id"],))
+        prediction = db.db.fetchone()
+        if prediction is None:
+            continue
+        prediction["trend"] = float(prediction["prediction"]) > float(prediction["current"])
+        predictions.append(prediction)
+    return render_template("predictions.html", predictions=predictions)
+
+
+@app.route('/all_predictions')
+@app.route('/all_predictions/<page>')
+def all_predictions(page=0):
+    page = int(page)
+    db = Database()
+    db.db.execute("""
+            SELECT predictions.prediction,current,time,updated_at,predictions.id,companies.name, companies.id as c_id FROM predictions INNER JOIN companies ON predictions.company_id = companies.id ORDER BY predictions.id DESC LIMIT %s OFFSET %s  
+        """, (10, 10 * int(page)))
+    predictions = db.db.fetchall()
+    if predictions is None:
+        return render_template("all_predictions.html", predictions=predictions)
+    for i in range(len(predictions)):
+        predictions[i]["trend"] = float(predictions[i]["prediction"]) > float(predictions[i]["current"])
+    return render_template("all_predictions.html", predictions=predictions, page=page)
+
+@app.route('/predict')
+def predict():
+    from parse import predict
+    predict()
+    return redirect('/predictions')
+
+@app.route('/prediction/<id>')
+def prediction(id):
+    db = Database()
+    db.db.execute("""
+            SELECT predictions.*,companies.name,companies.ticker FROM predictions INNER JOIN companies ON predictions.company_id = companies.id WHERE predictions.id=%s ORDER BY predictions.id DESC LIMIT 1  
+        """, (id,))
+    p = db.db.fetchone()
+    if p is None:
+        return render_template("prediction.html", prediction=p)
+    p["trend"] = float(p["prediction"]) > float(p["current"])
+    with open('./../data/companies.pickle', 'rb') as f:
+        companies = pickle.load(f)
+    l = list(filter(lambda c: c["ticker"] == p["ticker"], companies))
+    if len(l) > 0:
+        c = l[0]
+        coefs = c["coef"]
+        pvalues = c['pvalues']
+    else:
+        coefs = None
+        pvalues = None
+
+    return render_template("prediction.html", prediction=p, coefs=coefs, pvalues=pvalues)
 
 
 if __name__ == '__main__':

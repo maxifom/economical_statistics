@@ -51,6 +51,24 @@ CREATE TABLE IF NOT EXISTS economics.words (
   PRIMARY KEY (id),
   UNIQUE KEY word (word)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE = utf8_unicode_ci;
+CREATE TABLE IF NOT EXISTS `predictions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) UNSIGNED NOT NULL,
+  `mean_trading_day_variation` decimal(30,12) NOT NULL,
+  `mean_sent_score` decimal(30,12) NOT NULL,
+  `mean_word_count` decimal(30,12) NOT NULL,
+  `mean_trading_volume` decimal(30,12) NOT NULL,
+  `mean_overnight_variation` decimal(30,12) NOT NULL,
+  `mean_log_return` decimal(30,12) NOT NULL,
+  `mean_closing_price` decimal(30,12) NOT NULL,
+  `prediction` decimal(30,12) NOT NULL,
+  `current` decimal(30,12) NOT NULL,
+  `actual` decimal(30,12) NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `company_id_fk` (`company_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE = utf8_unicode_ci;
 INSERT IGNORE INTO economics.companies (id, name, full_name, parse_name, ticker, url)
 VALUES (1, 'Safmar Fin', 'Safmar Finansovye Investitsii PAO', 'Сафмар, Safmar', 'SFIN',
         'https://ru.investing.com/equities/yevroplan-pao');

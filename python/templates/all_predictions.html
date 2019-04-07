@@ -1,0 +1,33 @@
+{% extends "template.html" %}
+{% block title %}
+    Predictions Page {{ page }}
+{% endblock %}
+{% block body %}
+    <div style="display: flex; justify-content: start">
+        {% if page > 1 %}
+            <a style="margin-right:20px" href="/all_predictions/{{ page - 1 }}">Prev</a>
+        {% endif %}
+        <h4 style="margin-right:20px">Page # {{ page }}</h4>
+        <a style="margin-right:20px" href="/all_predictions/{{ page + 1 }}">Next</a>
+    </div>
+    <a href="/predictions">Last Predictions</a>
+    <h1>All predictions: </h1>
+    {% for prediction in predictions %}
+        <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
+            <a href="/prediction/{{ prediction['id'] }}"><h4>{{ prediction["name"] }}</h4></a>
+            <p>Time of prediction price: {{ "%.5f"|format(prediction["current"]) }} RUB</p>
+            <p>Prediction: {{ "%.5f"|format(prediction["prediction"]) }} RUB</p>
+            {% if prediction["actual"]!=0 %}
+                <p>Actual: {{ "%.5f"|format(prediction["actual"]) }} RUB</p>
+            {% endif %}
+            {% if prediction["trend"] %}
+                <h4 style="color: forestgreen;">UP ↑</h4>
+            {% else %}
+                <h4 style="color:lightcoral">DOWN ↓</h4>
+            {% endif %}
+            <p>Created: {{ prediction["time"] }}</p>
+            <p>Last update: {{ prediction["updated_at"] }}</p>
+        </div>
+    {% endfor %}
+
+{% endblock %}

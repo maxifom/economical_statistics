@@ -1,0 +1,29 @@
+{% extends "template.html" %}
+{% block title %}
+    Predictions
+{% endblock %}
+{% block body %}
+    <a href="/all_predictions">All Predictions</a>
+    <p>
+        <a class="btn btn-danger btn-sm" href="/predict">Predict Now</a>
+    </p>
+    <h1>Last predictions: </h1>
+    {% for prediction in predictions %}
+        <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
+            <a href="/prediction/{{ prediction['id'] }}"><h4>{{ prediction["name"] }}</h4></a>
+            <p>Time of prediction price: {{ "%.5f"|format(prediction["current"]) }} RUB</p>
+            <p>Prediction: {{ "%.5f"|format(prediction["prediction"]) }} RUB</p>
+            {% if prediction["actual"]!=0 %}
+                <p>Actual: {{ "%.5f"|format(prediction["actual"]) }} RUB</p>
+            {% endif %}
+            {% if prediction["trend"] %}
+                <h4 style="color: forestgreen;">UP ↑</h4>
+            {% else %}
+                <h4 style="color:lightcoral">DOWN ↓</h4>
+            {% endif %}
+            <p>Created: {{ prediction["time"] }}</p>
+            <p>Last update: {{ prediction["updated_at"] }}</p>
+        </div>
+    {% endfor %}
+
+{% endblock %}
