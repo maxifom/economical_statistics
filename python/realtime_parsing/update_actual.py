@@ -3,7 +3,7 @@ from database import Database
 def update_actual():
     db = Database()
     db.db.execute("""
-        SELECT * FROM predictions WHERE actual = 0
+        SELECT * FROM predictions WHERE actual = 0 AND time <= DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY )
     """)
     without_actual_predictions = db.db.fetchall()
     for p in without_actual_predictions:

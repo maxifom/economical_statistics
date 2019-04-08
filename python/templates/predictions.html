@@ -12,7 +12,13 @@
         <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
             <p>
                 <a href="/prediction/{{ prediction['id'] }}"><h4>{{ prediction["name"] }}</h4></a>
-                <span>{{ prediction["true"] }}/{{ prediction["count"] }} ({{ "%.2f"|format(prediction["true"]/prediction["count"]*100) }}%)</span>
+                <span>{{ prediction["true"] }}/{{ prediction["count"] }}
+                    {% if prediction["count"] %}
+                        ({{ "%.2f"|format(prediction["true"]/prediction["count"]*100) }}%)
+                    {% else %}
+                        (0%)
+                    {% endif %}
+                    </span>
             </p>
             <p>Time of prediction price: {{ "%.5f"|format(prediction["current"]) }} RUB</p>
             <p>Prediction: {{ "%.5f"|format(prediction["prediction"]) }} RUB</p>
