@@ -1,38 +1,50 @@
 {% extends "template.html" %}
 {% block title %}
-    Predictions
+    Last Predictions
 {% endblock %}
 {% block body %}
     <a href="/all_predictions">All Predictions</a>
     <p>
         <a class="btn btn-danger btn-sm" href="/predict">Predict Now</a>
     </p>
+     <p>
+        <a class="btn btn-primary btn-sm" href="/update_actual">Update actual</a>
+    </p>
     <h1>Last predictions: </h1>
-    {% for prediction in predictions %}
-        <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
-            <p>
-                <a href="/prediction/{{ prediction['id'] }}"><h4>{{ prediction["name"] }}</h4></a>
-                <span>{{ prediction["true"] }}/{{ prediction["count"] }}
-                    {% if prediction["count"] %}
-                        ({{ "%.2f"|format(prediction["true"]/prediction["count"]*100) }}%)
+    <table class="table table-responsive table-sm table-striped">
+        <thead>
+        <tr>
+            <td>Name</td>
+            <td>Percent</td>
+            <td>Pred.time price</td>
+            <td>Prediction</td>
+            <td>Created</td>
+            <td>Updated*</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for prediction in predictions %}
+            <tr>
+                <td>{{ prediction["name"] }}</td>
+                <td>{{ prediction["true"] }}/{{ prediction["count"] }}
+                    {{ prediction["percent"] }}%
+                </td>
+                <td>{{ "%.5f"|format(prediction["current"]) }}</td>
+                <td>
+                    {% if prediction["trend"] %}
+                        <span style="color: forestgreen;">{{ "%.5f"|format(prediction["prediction"]) }} ↑</span>
                     {% else %}
-                        (0%)
+                        <span style="color:lightcoral">{{ "%.5f"|format(prediction["prediction"]) }} ↓</span>
                     {% endif %}
-                    </span>
-            </p>
-            <p>Time of prediction price: {{ "%.5f"|format(prediction["current"]) }} RUB</p>
-            <p>Prediction: {{ "%.5f"|format(prediction["prediction"]) }} RUB</p>
-            {% if prediction["actual"]!=0 %}
-                <p>Actual: {{ "%.5f"|format(prediction["actual"]) }} RUB</p>
-            {% endif %}
-            {% if prediction["trend"] %}
-                <h4 style="color: forestgreen;">UP ↑</h4>
-            {% else %}
-                <h4 style="color:lightcoral">DOWN ↓</h4>
-            {% endif %}
-            <p>Created: {{ prediction["time"] }}</p>
-            <p>Last update: {{ prediction["updated_at"] }}</p>
-        </div>
-    {% endfor %}
+                </td>
+                <td>{{ prediction["time"] }}</td>
+                <td>{{ prediction["updated_at"] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <p>* - prediction price not updated since created</p>
+
+
 
 {% endblock %}

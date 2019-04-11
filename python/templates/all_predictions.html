@@ -4,7 +4,7 @@
 {% endblock %}
 {% block body %}
     <div style="display: flex; justify-content: start">
-        {% if page > 1 %}
+        {% if page > 0 %}
             <a style="margin-right:20px" href="/all_predictions/{{ page - 1 }}">Prev</a>
         {% endif %}
         <h4 style="margin-right:20px">Page # {{ page }}</h4>

@@ -7,7 +7,7 @@ import pandas as pd
 
 
 def predict():
-    with open("../data/companies.pickle", 'rb') as f:
+    with open("../../data/companies.pickle", 'rb') as f:
         companies_info = pickle.load(f)
     db = Database()
     db.db.execute("""SELECT * FROM companies WHERE name NOT LIKE '%(прив.)%'""")

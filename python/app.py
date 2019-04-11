@@ -160,6 +160,11 @@ def predictions():
             second = _d["actual"] > _d["current"]
             if first == second:
                 prediction["true"] += 1
+        if prediction["count"] == 0:
+            prediction["percent"] = "0"
+        else:
+            prediction["percent"] = "{0:.2f}".format(prediction["true"] / prediction["count"] * 100)
+    predictions = sorted(predictions, key=lambda p: (float(p["percent"]), float(p["true"])), reverse=True)
     return render_template("predictions.html", predictions=predictions)
 
 
@@ -170,7 +175,7 @@ def all_predictions(page=0):
     db = Database()
     db.db.execute("""
             SELECT predictions.prediction,actual,current,time,updated_at,predictions.id,companies.name, companies.id as c_id FROM predictions INNER JOIN companies ON predictions.company_id = companies.id ORDER BY predictions.id DESC LIMIT %s OFFSET %s  
-        """, (10, 10 * int(page)))
+        """, (50, 50 * int(page)))
     predictions = db.db.fetchall()
     if predictions is None:
         return render_template("all_predictions.html", predictions=predictions)
@@ -208,6 +213,13 @@ def prediction(id):
         pvalues = None
 
     return render_template("prediction.html", prediction=p, coefs=coefs, pvalues=pvalues)
+
+
+@app.route('/update_actual')
+def update_actual():
+    from update_actual import update_actual
+    update_actual()
+    return redirect('/predictions')
 
 
 if __name__ == '__main__':
