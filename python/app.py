@@ -140,6 +140,8 @@ def predictions():
     db.db.execute("""SELECT * FROM companies""")
     companies = db.db.fetchall()
     predictions = list()
+    tr = 0
+    l = 0
     for c in companies:
         db.db.execute("""
             SELECT predictions.prediction,actual,time,current, updated_at,predictions.id,companies.name FROM predictions INNER JOIN companies ON predictions.company_id = companies.id WHERE predictions.company_id=%s ORDER BY predictions.id DESC LIMIT 1  
@@ -164,8 +166,14 @@ def predictions():
             prediction["percent"] = "0"
         else:
             prediction["percent"] = "{0:.2f}".format(prediction["true"] / prediction["count"] * 100)
+        tr += prediction["true"]
+        l += prediction["count"]
+        if l == 0:
+            perc = 0
+        else:
+            perc = "{0:.2f}".format(tr / l * 100)
     predictions = sorted(predictions, key=lambda p: (float(p["percent"]), float(p["true"])), reverse=True)
-    return render_template("predictions.html", predictions=predictions)
+    return render_template("predictions.html", predictions=predictions, tr=tr, l=l, perc=perc)
 
 
 @app.route('/all_predictions')

@@ -1,6 +1,8 @@
 # economical_statistics
 Economical statistics project
 
+[Site](http://economics.maxifom.com/companies)
+
 # Done
 * Parsed all news from 2017-01-01, got all companies from the news, calculated sentiment score of news and word count
 * Parsed 1 minute and 1 hour canles history from MOEX for all companies since 2017-01-01
