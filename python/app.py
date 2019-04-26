@@ -83,7 +83,10 @@ def dict():
                     status = 'not parsing'
         else:
             status = 'not parsing'
-        return render_template('dict.html', dict=dict, status=status, percents=percents)
+        with open("./../data/word_cloud_data", "rb") as f:
+            words = pickle.load(f)
+        return render_template('dict.html', dict=dict, status=status, percents=percents, all_words=words[0],
+                               pos_words=words[1], neg_words=words[2])
 
 
 @app.route("/delete", methods=["POST"])
@@ -142,6 +145,8 @@ def predictions():
     predictions = list()
     tr = 0
     l = 0
+    with open("./../data/companies.pickle", 'rb') as c_file:
+        companies_from_file = pickle.load(c_file)
     for c in companies:
         db.db.execute("""
             SELECT predictions.prediction,actual,time,current, updated_at,predictions.id,companies.name FROM predictions INNER JOIN companies ON predictions.company_id = companies.id WHERE predictions.company_id=%s ORDER BY predictions.id DESC LIMIT 1  
@@ -172,6 +177,9 @@ def predictions():
             perc = 0
         else:
             perc = "{0:.2f}".format(tr / l * 100)
+        prediction["ma_percent"] = list(filter(
+            lambda _c: ("name" in _c and _c["name"] == prediction["name"]) or (prediction["name"] in _c["parse_name"]),
+            companies_from_file))[0]["ma_parcent"]
     predictions = sorted(predictions, key=lambda p: (float(p["percent"]), float(p["true"])), reverse=True)
     return render_template("predictions.html", predictions=predictions, tr=tr, l=l, perc=perc)
 

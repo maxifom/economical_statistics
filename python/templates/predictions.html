@@ -7,16 +7,29 @@
     <p>
         <a class="btn btn-danger btn-sm" href="/predict">Predict Now</a>
     </p>
-     <p>
+    <p>
         <a class="btn btn-primary btn-sm" href="/update_actual">Update actual</a>
     </p>
     <h1>Last predictions: </h1>
-    <h4>{{ tr }}/{{ l }} ({{ perc }}%)</h4>
+    <h4>Linreg: {{ tr }}/{{ l }} ({{ perc }}%)</h4>
+    <h4>MA percent: 48.3%</h4>
+    <div style="display: flex; flex-direction: row;">
+        <div style="width: 50%; max-height: 100%;text-align: center">
+            <h3>Linreg:</h3>
+            <canvas id="myChart"></canvas>
+        </div>
+        <div style="width: 50%;max-height: 100%;text-align: center">
+            <h3>MA:</h3>
+            <canvas id="myChart2"></canvas>
+        </div>
+    </div>
+    <br>
     <table class="table table-responsive table-sm table-striped">
         <thead>
         <tr>
             <td>Name</td>
             <td>Percent</td>
+            <td>MA Percent</td>
             <td>Pred.time price</td>
             <td>Prediction</td>
             <td>Created</td>
@@ -30,6 +43,8 @@
                 <td>{{ prediction["true"] }}/{{ prediction["count"] }}
                     {{ prediction["percent"] }}%
                 </td>
+                <td>{{ "%.2f"|format(prediction["ma_percent"]) }}%</td>
+
                 <td>{{ "%.5f"|format(prediction["current"]) }}</td>
                 <td>
                     {% if prediction["trend"] %}
@@ -46,6 +61,45 @@
     </table>
     <p>* - prediction price not updated since created</p>
 
-
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+    <script>
+        let ctx = document.getElementById('myChart').getContext('2d');
+        let data = {
+            datasets: [{
+                data: [{{ tr }}, {{ l - tr }}],
+                backgroundColor: ["rgba(19, 136, 8, 0.8)", "rgba(248, 0, 0,0.8)"]
+            }],
+            labels: [
+                'True',
+                'False',
+            ]
+        };
+        let myPieChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: data,
+            options: {
+                rotation: 0.5 * Math.PI,
+            }
+        })
+    </script>
+    <script>
+        let ctx2 = document.getElementById('myChart2').getContext('2d');
+        let data2 = {
+            datasets: [{
+                data: [48.3, 51.7],
+                backgroundColor: ["rgba(19, 136, 8, 0.8)", "rgba(248, 0, 0,0.8)"]
+            }],
+            labels: [
+                'True',
+                'False',
+            ]
+        };
+        let myPieChart2 = new Chart(ctx2, {
+            type: 'doughnut',
+            data: data2,
+            options: {
+                rotation: 0.5 * Math.PI
+            }
+        })
+    </script>
 {% endblock %}

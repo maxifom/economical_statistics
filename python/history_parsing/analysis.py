@@ -4,22 +4,24 @@ from database import Database
 morpher = pymorphy2.MorphAnalyzer()
 
 
-def sentence_info(sentence):
-    db = Database()
-    db.db.execute("""
-        SELECT word from words WHERE is_positive=1
-    """)
-    positive = db.db.fetchall()
-    db.db.execute("""
-            SELECT word from words WHERE is_positive=0
+def sentence_info(sentence, positive=[], negative=[]):
+    if len(positive) == 0 and len(negative) == 0:
+        db = Database()
+        db.db.execute("""
+            SELECT word from words WHERE is_positive=1
         """)
-    negative = db.db.fetchall()
-    positive = sorted(positive, key=lambda x: len(x["word"].split(' ')), reverse=True)
-    negative = sorted(negative, key=lambda x: len(x["word"].split(' ')), reverse=True)
+        positive = db.db.fetchall()
+        db.db.execute("""
+                SELECT word from words WHERE is_positive=0
+            """)
+        negative = db.db.fetchall()
+        positive = sorted(positive, key=lambda x: len(x["word"].split(' ')), reverse=True)
+        negative = sorted(negative, key=lambda x: len(x["word"].split(' ')), reverse=True)
     words = list()
     splitted = sentence.split('.')
     first_sentence = splitted[0]
-    first_sentence = first_sentence.replace('.', ' ').replace(',', ' ').replace('\n', '').replace('\t', '').lstrip(' ').rstrip(
+    first_sentence = first_sentence.replace('.', ' ').replace(',', ' ').replace('\n', '').replace('\t', '').lstrip(
+        ' ').rstrip(
         ' ').replace('"', '').replace('  ', ' ')
     first_sentence = first_sentence.split(' ')
     for i in range(len(first_sentence)):
@@ -116,10 +118,6 @@ def sentence_info(sentence):
         words_to_delete = []
         if "word" in _p:
             words.append(_p)
-
-
-
-
 
     # Text
     for p in positive:

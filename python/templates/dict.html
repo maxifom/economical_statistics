@@ -4,90 +4,503 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Dictionary</h1>
-    <div style="max-height: 300px; overflow-y: scroll">
-        <table class="table table-sm">
-            <thead>
-            <tr>
-                <td>Word</td>
-                <td>Type</td>
-                <td>Delete</td>
-            </tr>
-            </thead>
-            <tbody>
-            {% for d in dict %}
+    <div>
+        <h1>Word Cloud:</h1>
+        <div class="cloud"></div>
+        <div class="pcloud"></div>
+        <div class="ncloud"></div>
+
+    </div>
+
+    <button class="btn btn-primary m-4 showBtn">Show page</button>
+
+    <div style="display: none;" class="mp">
+        <h1>Dictionary</h1>
+        <div style="max-height: 300px; overflow-y: scroll">
+            <table class="table table-sm">
+                <thead>
                 <tr>
-                    <td>{{ d["word"] }}</td>
-                    {% if d["is_positive"] == 1 %}
-                        <td style="color: lightgreen;">Positive</td>
-                    {% else %}
-                        <td style="color:lightcoral">Negative</td>
-                    {% endif %}
-                    <td>
-                        <form action="/delete" method="POST">
-                            <input type="hidden" name="id" value="{{ d['id'] }}">
-                            <button class="btn btn-danger btn-sm">Delete</button>
-                        </form>
-                    </td>
+                    <td>Word</td>
+                    <td>Type</td>
+                    <td>Delete</td>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                {% for d in dict %}
+                    <tr>
+                        <td>{{ d["word"] }}</td>
+                        {% if d["is_positive"] == 1 %}
+                            <td style="color: lightgreen;">Positive</td>
+                        {% else %}
+                            <td style="color:lightcoral">Negative</td>
+                        {% endif %}
+                        <td>
+                            <form action="/delete" method="POST">
+                                <input type="hidden" name="id" value="{{ d['id'] }}">
+                                <button class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-    <div style="margin:40px;">
-        <form method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="file">File</label>
-                <input type="file" name="file" id="file">
-            </div>
-            <div class="form-group">
-                <label for="positive">Positive</label>
-                <input type="radio" name="type" value="positive" id="positive">
-            </div>
-            <div class="form-group">
-                <label for="negative">Negative</label>
-                <input type="radio" name="type" value="negative" id="negative">
-            </div>
-            <button class="btn btn-primary">Submit file</button>
-        </form>
-    </div>
+        <div style="margin:40px;">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="file">File</label>
+                    <input type="file" name="file" id="file">
+                </div>
+                <div class="form-group">
+                    <label for="positive">Positive</label>
+                    <input type="radio" name="type" value="positive" id="positive">
+                </div>
+                <div class="form-group">
+                    <label for="negative">Negative</label>
+                    <input type="radio" name="type" value="negative" id="negative">
+                </div>
+                <button class="btn btn-primary">Submit file</button>
+            </form>
+        </div>
 
-    <div style="margin-top:50px">
-        <h1>Current STATUS :
-            {% if status == 'parsing' %}
-                <span style="color:lightcoral">Parsing</span>
-            {% else %}
-                <span style="color:lightgreen">Not Parsing</span>
-                <form action="/reparse" method="POST">
-                    <button class="btn btn-danger">Reparse</button>
-                </form>
-            {% endif %}
-        </h1>
-    </div>
+        <div style="margin-top:50px">
+            <h1>Current STATUS :
+                {% if status == 'parsing' %}
+                    <span style="color:lightcoral">Parsing</span>
+                {% else %}
+                    <span style="color:lightgreen">Not Parsing</span>
+                    <form action="/reparse" method="POST">
+                        <button class="btn btn-danger">Reparse</button>
+                    </form>
+                {% endif %}
+            </h1>
+        </div>
 
 
-    {% if percents %}
-        <h3>{{ "%.1f"|format(percents["min"]*100) }}% - {{ "%.1f"|format(percents["max"]*100) }}% on history</h3>
-        <table class="table table-responsive table-sm table-striped">
-            <thead>
-            <tr>
-                <td>Ticker</td>
-                <td>True</td>
-                <td>False</td>
-                <td>Percent</td>
-            </tr>
-            </thead>
-            <tbody>
-            {% for p in percents["values"] %}
+        {% if percents %}
+            <h3>{{ "%.1f"|format(percents["min"]*100) }}% - {{ "%.1f"|format(percents["max"]*100) }}% on history</h3>
+            <table class="table table-responsive table-sm table-striped">
+                <thead>
                 <tr>
-                    <td>{{ p["ticker"] }}</td>
-                    <td>{{ p["true"] }}</td>
-                    <td>{{ p["false"] }}</td>
-                    <td title="{{ p['percent']*100 }}">{{ "%.1f"|format(p["percent"]*100) }}%</td>
+                    <td>Ticker</td>
+                    <td>True</td>
+                    <td>False</td>
+                    <td>Percent</td>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+                </thead>
+                <tbody>
+                {% for p in percents["values"] %}
+                    <tr>
+                        <td>{{ p["ticker"] }}</td>
+                        <td>{{ p["true"] }}</td>
+                        <td>{{ p["false"] }}</td>
+                        <td title="{{ p['percent']*100 }}">{{ "%.1f"|format(p["percent"]*100) }}%</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.min.js"></script>
+    <script>
+        var neg_words = JSON.parse('{{ neg_words | tojson }}');
+        var nwords = Object.keys(neg_words)
+            .map(function (d, i) {
+                //console.log(d);
+                return {text: d, size: neg_words[d]};
+            });
+        var fillColor = "#ff2a28";
+        var fontName = "Impact",
+            cWidth = 1000,
+            cHeight = 600,
+            svg,
+            wCloud,
+            bbox,
+            ctm,
+            bScale,
+            bWidth,
+            bHeight,
+            bMidX,
+            bMidY,
+            bDeltaX,
+            bDeltaY;
+
+        var cTemp = document.createElement('canvas'),
+            ctx = cTemp.getContext('2d');
+        ctx.font = "100px " + fontName;
+
+        var fRatio = Math.min(cWidth, cHeight) / ctx.measureText(nwords[0].text).width,
+            fontScale = d3.scale.linear()
+                .domain([
+                    d3.min(nwords, function (d) {
+                        return d.size;
+                    }),
+                    d3.max(nwords, function (d) {
+                        return d.size;
+                    })
+                ])
+                //.range([20,120]),
+                .range([20, 100 * fRatio / 2]), // tbc
+            fill = d3.scale.category20();
+
+        d3.layout.cloud()
+            .size([cWidth, cHeight])
+            .words(nwords)
+            //.padding(2) // controls
+            .rotate(function () {
+                return ~~(Math.random() * 2) * 90;
+            })
+            .font(fontName)
+            .fontSize(function (d) {
+                return fontScale(d.size)
+            })
+            .on("end", drawN)
+            .start();
+
+        function drawN(words, bounds) {
+            // move and scale cloud bounds to canvas
+            // bounds = [{x0, y0}, {x1, y1}]
+            bWidth = bounds[1].x - bounds[0].x;
+            bHeight = bounds[1].y - bounds[0].y;
+            bMidX = bounds[0].x + bWidth / 2;
+            bMidY = bounds[0].y + bHeight / 2;
+            bDeltaX = cWidth / 2 - bounds[0].x + bWidth / 2;
+            bDeltaY = cHeight / 2 - bounds[0].y + bHeight / 2;
+            bScale = bounds ? Math.min(cWidth / bWidth, cHeight / bHeight) : 1;
+
+            console.log(
+                "bounds (" + bounds[0].x +
+                ", " + bounds[0].y +
+                ", " + bounds[1].x +
+                ", " + bounds[1].y +
+                "), width " + bWidth +
+                ", height " + bHeight +
+                ", mid (" + bMidX +
+                ", " + bMidY +
+                "), delta (" + bDeltaX +
+                ", " + bDeltaY +
+                "), scale " + bScale
+            );
+
+            // the library's bounds seem not to correspond to reality?
+            // try using .getBBox() instead?
+
+            svg = d3.select(".ncloud").append("svg")
+                .attr("width", cWidth)
+                .attr("height", cHeight);
+
+            wCloud = svg.append("g")
+            //.attr("transform", "translate(" + [bDeltaX, bDeltaY] + ") scale(" + 1 + ")") // nah!
+                .attr("transform", "translate(" + [bWidth >> 1, bHeight >> 1] + ") scale(" + bScale + ")") // nah!
+                .selectAll("text")
+                .data(words)
+                .enter().append("text")
+                .style("font-size", function (d) {
+                    return d.size + "px";
+                })
+                .style("font-family", fontName)
+                .style("fill", fillColor)
+                .attr("text-anchor", "middle")
+                .transition()
+                .duration(600)
+                .attr("transform", function (d) {
+                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                })
+                .text(function (d) {
+                    return d.text;
+                });
+
+            // TO DO: function to find min and max x,y of all words
+            // and use it as the group's bbox
+            // then do the transformation
+            bbox = wCloud.node(0).getBBox();
+            //ctm = wCloud.node().getCTM();
+            console.log(
+                "bbox (x: " + bbox.x +
+                ", y: " + bbox.y +
+                ", w: " + bbox.width +
+                ", h: " + bbox.height +
+                ")"
+            );
+
+        };
+    </script>
+    <script>
+        var pos_words = JSON.parse('{{ pos_words | tojson }}');
+        var pwords = Object.keys(pos_words)
+            .map(function (d, i) {
+                //console.log(d);
+                return {text: d, size: pos_words[d]};
+            });
+        var fillColor = "#54b42f";
+        var fontName = "Impact",
+            cWidth = 1000,
+            cHeight = 600,
+            svg,
+            wCloud,
+            bbox,
+            ctm,
+            bScale,
+            bWidth,
+            bHeight,
+            bMidX,
+            bMidY,
+            bDeltaX,
+            bDeltaY;
+
+        var cTemp = document.createElement('canvas'),
+            ctx = cTemp.getContext('2d');
+        ctx.font = "100px " + fontName;
+
+        var fRatio = Math.min(cWidth, cHeight) / ctx.measureText(pwords[0].text).width,
+            fontScale = d3.scale.linear()
+                .domain([
+                    d3.min(pwords, function (d) {
+                        return d.size;
+                    }),
+                    d3.max(pwords, function (d) {
+                        return d.size;
+                    })
+                ])
+                //.range([20,120]),
+                .range([20, 100 * fRatio / 2]), // tbc
+            fill = d3.scale.category20();
+
+        d3.layout.cloud()
+            .size([cWidth, cHeight])
+            .words(pwords)
+            //.padding(2) // controls
+            .rotate(function () {
+                return ~~(Math.random() * 2) * 90;
+            })
+            .font(fontName)
+            .fontSize(function (d) {
+                return fontScale(d.size)
+            })
+            .on("end", drawP)
+            .start();
+
+        function drawP(words, bounds) {
+            // move and scale cloud bounds to canvas
+            // bounds = [{x0, y0}, {x1, y1}]
+            bWidth = bounds[1].x - bounds[0].x;
+            bHeight = bounds[1].y - bounds[0].y;
+            bMidX = bounds[0].x + bWidth / 2;
+            bMidY = bounds[0].y + bHeight / 2;
+            bDeltaX = cWidth / 2 - bounds[0].x + bWidth / 2;
+            bDeltaY = cHeight / 2 - bounds[0].y + bHeight / 2;
+            bScale = bounds ? Math.min(cWidth / bWidth, cHeight / bHeight) : 1;
+
+            console.log(
+                "bounds (" + bounds[0].x +
+                ", " + bounds[0].y +
+                ", " + bounds[1].x +
+                ", " + bounds[1].y +
+                "), width " + bWidth +
+                ", height " + bHeight +
+                ", mid (" + bMidX +
+                ", " + bMidY +
+                "), delta (" + bDeltaX +
+                ", " + bDeltaY +
+                "), scale " + bScale
+            );
+
+            // the library's bounds seem not to correspond to reality?
+            // try using .getBBox() instead?
+
+            svg = d3.select(".pcloud").append("svg")
+                .attr("width", cWidth)
+                .attr("height", cHeight);
+
+            wCloud = svg.append("g")
+            //.attr("transform", "translate(" + [bDeltaX, bDeltaY] + ") scale(" + 1 + ")") // nah!
+                .attr("transform", "translate(" + [bWidth >> 1, bHeight >> 1] + ") scale(" + bScale + ")") // nah!
+                .selectAll("text")
+                .data(words)
+                .enter().append("text")
+                .style("font-size", function (d) {
+                    return d.size + "px";
+                })
+                .style("font-family", fontName)
+                .style("fill", fillColor)
+                .attr("text-anchor", "middle")
+                .transition()
+                .duration(600)
+                .attr("transform", function (d) {
+                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                })
+                .text(function (d) {
+                    return d.text;
+                });
+
+            // TO DO: function to find min and max x,y of all words
+            // and use it as the group's bbox
+            // then do the transformation
+            bbox = wCloud.node(0).getBBox();
+            //ctm = wCloud.node().getCTM();
+            console.log(
+                "bbox (x: " + bbox.x +
+                ", y: " + bbox.y +
+                ", w: " + bbox.width +
+                ", h: " + bbox.height +
+                ")"
+            );
+
+        };
+    </script>
+    <script>
+        var all_words = JSON.parse('{{ all_words | tojson }}');
+
+
+        var words = Object.keys(all_words)
+            .map(function (d, i) {
+                //console.log(d);
+                color = all_words[d] > 0 ? "#54b42f" : "#ff2a28";
+
+                return {text: d, size: all_words[d], color: color};
+            });
+        var fillColor = "#000000";
+        var fontName = "Impact",
+            cWidth = 1000,
+            cHeight = 600,
+            svg,
+            wCloud,
+            bbox,
+            ctm,
+            bScale,
+            bWidth,
+            bHeight,
+            bMidX,
+            bMidY,
+            bDeltaX,
+            bDeltaY;
+
+        var cTemp = document.createElement('canvas'),
+            ctx = cTemp.getContext('2d');
+        ctx.font = "100px " + fontName;
+
+        var fRatio = Math.min(cWidth, cHeight) / ctx.measureText(words[0].text).width,
+            fontScale = d3.scale.linear()
+                .domain([
+                    d3.min(words, function (d) {
+                        return d.size;
+                    }),
+                    d3.max(words, function (d) {
+                        return d.size;
+                    })
+                ])
+                //.range([20,120]),
+                .range([20, 100 * fRatio / 2]), // tbc
+            fill = d3.scale.category20();
+
+        d3.layout.cloud()
+            .size([cWidth, cHeight])
+            .words(words)
+            //.padding(2) // controls
+            .rotate(function () {
+                return ~~(Math.random() * 2) * 90;
+            })
+            .font(fontName)
+            .fontSize(function (d) {
+                return fontScale(d.size)
+            })
+            .on("end", draw)
+            .start();
+
+        function draw(words, bounds) {
+            // move and scale cloud bounds to canvas
+            // bounds = [{x0, y0}, {x1, y1}]
+            bWidth = bounds[1].x - bounds[0].x;
+            bHeight = bounds[1].y - bounds[0].y;
+            bMidX = bounds[0].x + bWidth / 2;
+            bMidY = bounds[0].y + bHeight / 2;
+            bDeltaX = cWidth / 2 - bounds[0].x + bWidth / 2;
+            bDeltaY = cHeight / 2 - bounds[0].y + bHeight / 2;
+            bScale = bounds ? Math.min(cWidth / bWidth, cHeight / bHeight) : 1;
+
+            console.log(
+                "bounds (" + bounds[0].x +
+                ", " + bounds[0].y +
+                ", " + bounds[1].x +
+                ", " + bounds[1].y +
+                "), width " + bWidth +
+                ", height " + bHeight +
+                ", mid (" + bMidX +
+                ", " + bMidY +
+                "), delta (" + bDeltaX +
+                ", " + bDeltaY +
+                "), scale " + bScale
+            );
+
+            // the library's bounds seem not to correspond to reality?
+            // try using .getBBox() instead?
+
+            svg = d3.select(".cloud").append("svg")
+                .attr("width", cWidth)
+                .attr("height", cHeight);
+
+            wCloud = svg.append("g")
+            //.attr("transform", "translate(" + [bDeltaX, bDeltaY] + ") scale(" + 1 + ")") // nah!
+                .attr("transform", "translate(" + [bWidth >> 1, bHeight >> 1] + ") scale(" + bScale + ")") // nah!
+                .selectAll("text")
+                .data(words)
+                .enter().append("text")
+                .style("font-size", function (d) {
+                    return d.size + "px";
+                })
+                .style("font-family", fontName)
+                .style("fill", function (d, i) {
+                    return d["color"]
+                })
+                .attr("text-anchor", "middle")
+                .transition()
+                .duration(600)
+                .attr("transform", function (d) {
+                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                })
+                .text(function (d) {
+                    return d.text;
+                });
+
+            // TO DO: function to find min and max x,y of all words
+            // and use it as the group's bbox
+            // then do the transformation
+            bbox = wCloud.node(0).getBBox();
+            //ctm = wCloud.node().getCTM();
+            console.log(
+                "bbox (x: " + bbox.x +
+                ", y: " + bbox.y +
+                ", w: " + bbox.width +
+                ", h: " + bbox.height +
+                ")"
+            );
+
+        };
+
+        function sortByFrequency(arr) {
+            var f = {};
+            arr.forEach(function (i) {
+                f[i] = 0;
+            });
+            var u = arr.filter(function (i) {
+                return ++f[i] == 1;
+            });
+            return u.sort(function (a, b) {
+                return f[b] - f[a];
+            });
+        }</script>
+    <script>
+        let btn = document.querySelector(".showBtn");
+        let mainDiv = document.querySelector(".mp");
+        btn.onclick = function () {
+            if (mainDiv.style.display === "none") {
+                mainDiv.style.display = "block";
+            } else {
+                mainDiv.style.display = "none";
+            }
+        }
+    </script>
 {% endblock %}
