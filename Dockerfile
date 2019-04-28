@@ -10,6 +10,6 @@ RUN polyglot download sentiment2.ru
 COPY ./crontab/crontab /etc/cron.d/
 COPY ./docker/entrypoint.sh /
 COPY ./data/companies.pickle ./data/
-RUN chmod -R 777 /etc/cron.d/ /entrypoint.sh && crontab /etc/cron.d/crontab
+RUN chmod -R 777 /etc/cron.d/ /entrypoint.sh && crontab /etc/cron.d/crontab && export PYTHONPATH=$PYTHONPATH:/usr/src/app/python
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/usr/bin/supervisord","-c","/etc/supervisor/supervisord.conf"]

@@ -1,13 +1,12 @@
 import os
-from polyglot.text import Text
 from parse_words_from_news import parse_news
-from database import Database
+from misc.database import Database
 import pytz
 import scrapy
 from scrapy.crawler import CrawlerProcess
 import logging
 from datetime import datetime
-from analysis import sentence_info
+from misc.analysis import sentence_info
 
 news = list()
 

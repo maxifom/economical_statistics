@@ -1,5 +1,5 @@
 import pymorphy2
-from database import Database
+from misc.database import Database
 
 morpher = pymorphy2.MorphAnalyzer()
 
@@ -11,7 +11,7 @@ def positive_from_txt(file):
         spl = lines[i].split(' ')
         if len(spl) > 1:
             for _i in range(0, len(spl)):
-                spl[_i] = spl[_i].rstrip('\n').rstrip(' ').replace('  ', ' ').lower()
+                spl[_i] = spl[_i].rstrip('\n').lower()
                 c = 0
                 while spl[_i] != morpher.parse(spl[_i])[0].normal_form:
                     spl[_i] = morpher.parse(spl[_i])[0].normal_form
@@ -20,7 +20,7 @@ def positive_from_txt(file):
                         break
             lines[i] = ' '.join(spl)
         else:
-            lines[i] = lines[i].rstrip('\n').rstrip(' ').replace('  ', ' ').lower()
+            lines[i] = lines[i].rstrip('\n').lower()
             c = 0
             while lines[i] != morpher.parse(lines[i])[0].normal_form:
                 lines[i] = morpher.parse(lines[i])[0].normal_form
@@ -42,7 +42,7 @@ def negative_from_txt(file):
         spl = lines[i].split(' ')
         if len(spl) > 1:
             for _i in range(0, len(spl)):
-                spl[_i] = spl[_i].rstrip('\n').rstrip(' ').replace('  ', ' ').lower()
+                spl[_i] = spl[_i].rstrip('\n').lower()
                 c = 0
                 while spl[_i] != morpher.parse(spl[_i])[0].normal_form:
                     spl[_i] = morpher.parse(spl[_i])[0].normal_form
@@ -51,7 +51,7 @@ def negative_from_txt(file):
                         break
             lines[i] = ' '.join(spl)
         else:
-            lines[i] = lines[i].rstrip('\n').rstrip(' ').replace('  ', ' ').lower()
+            lines[i] = lines[i].rstrip('\n').lower()
             c = 0
             while lines[i] != morpher.parse(lines[i])[0].normal_form:
                 lines[i] = morpher.parse(lines[i])[0].normal_form

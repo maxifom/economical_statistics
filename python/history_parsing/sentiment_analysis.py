@@ -2,7 +2,7 @@ import numpy
 from polyglot.text import Text
 import pandas as pd
 
-from analysis import sentence_info
+from misc.analysis import sentence_info
 
 
 def calculate_sent_score(series):

@@ -1,9 +1,9 @@
 import pickle
 
-from database import Database
+from misc.database import Database
 from polyglot.text import Text
 
-from analysis import sentence_info
+from misc.analysis import sentence_info
 
 
 def parse_news():

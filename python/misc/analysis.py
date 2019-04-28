@@ -1,25 +1,27 @@
 import pymorphy2
-from database import Database
+from misc.database import Database
 
 morpher = pymorphy2.MorphAnalyzer()
 
 
-def sentence_info(sentence):
-    db = Database()
-    db.db.execute("""
-        SELECT word from words WHERE is_positive=1
-    """)
-    positive = db.db.fetchall()
-    db.db.execute("""
-            SELECT word from words WHERE is_positive=0
+def sentence_info(sentence, positive=[], negative=[]):
+    if len(positive) == 0 and len(negative) == 0:
+        db = Database()
+        db.db.execute("""
+            SELECT word from words WHERE is_positive=1
         """)
-    negative = db.db.fetchall()
-    positive = sorted(positive, key=lambda x: len(x["word"].split(' ')), reverse=True)
-    negative = sorted(negative, key=lambda x: len(x["word"].split(' ')), reverse=True)
+        positive = db.db.fetchall()
+        db.db.execute("""
+                SELECT word from words WHERE is_positive=0
+            """)
+        negative = db.db.fetchall()
+        positive = sorted(positive, key=lambda x: len(x["word"].split(' ')), reverse=True)
+        negative = sorted(negative, key=lambda x: len(x["word"].split(' ')), reverse=True)
     words = list()
     splitted = sentence.split('.')
     first_sentence = splitted[0]
-    first_sentence = first_sentence.replace('.', ' ').replace(',', ' ').replace('\n', '').replace('\t', '').lstrip(' ').rstrip(
+    first_sentence = first_sentence.replace('.', ' ').replace(',', ' ').replace('\n', '').replace('\t', '').lstrip(
+        ' ').rstrip(
         ' ').replace('"', '').replace('  ', ' ')
     first_sentence = first_sentence.split(' ')
     for i in range(len(first_sentence)):
@@ -29,7 +31,6 @@ def sentence_info(sentence):
             c += 1
             if c > 5:
                 break
-    print(first_sentence)
     sentence = '.'.join(splitted[1:])
     sentence = sentence.replace('.', ' ').replace(',', ' ').replace('\n', '').replace('\t', '').lstrip(' ').rstrip(
         ' ').replace('"', '').replace('  ', ' ')
@@ -43,7 +44,7 @@ def sentence_info(sentence):
                 break
     result = dict()
     result["word_count"] = len(sentence) + len(first_sentence)
-    result["sentence"] = ' '.join(first_sentence) +' '+ ' '.join(sentence)
+    result["sentence"] = ' '.join(first_sentence) + ' ' + ' '.join(sentence)
     positives = 0
     negatives = 0
     # title
@@ -118,10 +119,6 @@ def sentence_info(sentence):
         if "word" in _p:
             words.append(_p)
 
-
-
-
-
     # Text
     for p in positive:
         words_to_delete = []
@@ -193,7 +190,7 @@ def sentence_info(sentence):
         words_to_delete = []
         if "word" in _p:
             words.append(_p)
-    if positives - negatives != 0:
+    if positives + negatives != 0:
         result["sent_score"] = (positives - negatives) / (positives + negatives)
     else:
         result["sent_score"] = 0
@@ -202,7 +199,5 @@ def sentence_info(sentence):
 
 
 if __name__ == '__main__':
-    s = """Инвестпрограмма "Роснефти" в 2017 году составит 1,1 трлн рублей, в 2018 - 1,3 трлн. "Роснефть" планирует направить на инвестиционную программу "Роснефти" в 2017 году 1,1 трлн рублей, в 2018 году – 1,3 трлн. Об этом рассказал глава компании Игорь Сечин на встрече с Владимиром Путиным.В 2017 году компания придаст особое значение вводу новых месторождений: это развитие Сузунского месторождения, Лодочное месторождение, Русское, Куюмбинское, Юрубчено-Тохомское [месторождения], Таас-Юрях. И газовые активы: "Роспан", "Харампур", Кынско-Часельское месторождение.
-
-Parsed view: роснефть планировать направить на инвестиционный программа роснефть в 2017 год 1 1 триллион рубль в 2018 год – 1 3 триллион о это рассказать глава компания игорь сечин на встреча с владимир путин в 2017 год компания придать особый значение ввод новый месторождений: это развитие сузунский месторождение лодочный месторождение русский куюмбинский юрубчено-тохомский [месторождения] таас-юрить и газовый активы: роспан харампур кынско-часельское месторождение"""
+    s = """Чистая прибыль "ФосАгро" в 2018 году снизилась на 13%. Чистая прибыль "ФосАгро" по МСФО в 2018 году снизилась на 13% - до 22,135 млрд рублей, сообщает компания.Выручка составила 233,43 млрд рублей (+29%).Выручка "ФосАгро" за четвертый квартал выросла на 30% до 59,4 млрд рублей (893 млн долларов США), в то время как EBITDA увеличилась на 51% до 18,6 млрд рублей (279 млн долларов США). Таким образом, в четвертом квартале 2018 года рентабельность по EBITDA увеличилась до 31% с 27% годом ранее.Чистая прибыль (скорректированная на неденежные валютные статьи) за четвертый квартал выросла практически в три раза до 10,9 млрд рублей (164 млн долларов США), данный показатель за 2018 год достиг 41,7 млрд рублей (666 млн долларов США)."""
     print(sentence_info(s))

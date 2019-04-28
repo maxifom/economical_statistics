@@ -3,9 +3,11 @@ import pickle
 
 import pandas as pd
 from flask import Flask, render_template, request, redirect
-from database import Database
-from add_to_dictionary import *
-from analysis import sentence_info
+from misc.add_to_dictionary import positive_from_txt, negative_from_txt
+from misc.database import Database
+from misc.analysis import sentence_info
+from realtime_parsing.parse import predict
+from realtime_parsing import update_actual
 
 app = Flask(__name__)
 
@@ -202,7 +204,6 @@ def all_predictions(page=0):
 
 @app.route('/predict')
 def predict():
-    from parse import predict
     predict()
     return redirect('/predictions')
 
@@ -233,7 +234,6 @@ def prediction(id):
 
 @app.route('/update_actual')
 def update_actual():
-    from update_actual import update_actual
     update_actual()
     return redirect('/predictions')
 

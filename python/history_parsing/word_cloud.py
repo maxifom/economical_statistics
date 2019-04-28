@@ -2,8 +2,8 @@ import os
 
 import math
 import pandas as pd
-from database import Database
-from analysis import sentence_info
+from misc.database import Database
+from misc.analysis import sentence_info
 import pickle
 from datetime import datetime, timedelta
 

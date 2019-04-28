@@ -1,12 +1,12 @@
 import os
 from datetime import datetime
+from history_parsing.companies_extractor import extract_companies
+from history_parsing.linreg_coef_final import calculate_linreg_coef_and_pvalues
+from history_parsing.linreg_params_final import calculate_params
+from history_parsing.sentiment_analysis import sentiment_companies
+from history_parsing.reparse_news_from_db import parse_news
+from history_parsing.true_percent import calculate_percent_true
 
-from companies_extractor import extract_companies
-from linreg_coef_final import calculate_linreg_coef_and_pvalues
-from linreg_params_final import calculate_params
-from sentiment_analysis import sentiment_companies
-from reparse_news_from_db import parse_news
-from true_percent import calculate_percent_true
 
 def reparse():
     try:

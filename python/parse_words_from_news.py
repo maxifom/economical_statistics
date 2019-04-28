@@ -1,7 +1,7 @@
 import pickle
 
-from database import Database
-from analysis import sentence_info
+from misc.database import Database
+from misc.analysis import sentence_info
 
 
 def parse_news():

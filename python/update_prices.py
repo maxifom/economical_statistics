@@ -2,8 +2,8 @@ import logging
 import scrapy
 from scrapy.crawler import CrawlerProcess
 
-from database import Database
-from format import Formatter
+from misc.database import Database
+from misc.format import Formatter
 
 
 class InvestingComSpider(scrapy.Spider):
