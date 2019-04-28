@@ -12,7 +12,7 @@
     </p>
     <h1>Last predictions: </h1>
     <h4>Linreg: {{ tr }}/{{ l }} ({{ perc }}%)</h4>
-    <h4>MA percent: 48.3%</h4>
+    <h4>MA percent: {{ "%.2f"|format(mean_ma_percent) }}%</h4>
     <div style="display: flex; flex-direction: row;">
         <div style="width: 50%; max-height: 100%;text-align: center">
             <h3>Linreg:</h3>
@@ -86,7 +86,7 @@
         let ctx2 = document.getElementById('myChart2').getContext('2d');
         let data2 = {
             datasets: [{
-                data: [48.3, 51.7],
+                data: [{{ "%.2f"|format(mean_ma_percent) }},{{ "%.2f"|format(100-mean_ma_percent) }}],
                 backgroundColor: ["rgba(19, 136, 8, 0.8)", "rgba(248, 0, 0,0.8)"]
             }],
             labels: [

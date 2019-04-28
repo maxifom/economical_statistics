@@ -13,7 +13,11 @@ if __name__ == '__main__':
         df.drop(
             columns=["Unnamed: 0", "sent_score", "log_return", "volume", "overnight_variation", "trading_day_variation",
                      "word_count", "time"], inplace=True)
-        df["ma"] = df["close"].mul(df['close']).cumsum().div(df['close'].cumsum())
+        # df["ma"] = df["close"].mul(df['close']).cumsum().div(df['close'].cumsum())
+        df_copy = df.copy()
+        a = df_copy.rolling(window=50, on="close").mean()
+        df["ma"] = a["next_closing_price"]
+        df.dropna(inplace=True)
         df_dict = df.to_dict(orient='rows')
         sign = -1
         for d in df_dict:
@@ -36,6 +40,8 @@ if __name__ == '__main__':
         t["ma_parcent"] = ma_percent
         print(ma_percent)
     print("MEAN:", sum_percents / count_percents)
-    print(parse_names)
+    for t in parse_names:
+        t["mean_ma_percent"] = sum_percents / count_percents
+    # print(parse_names)
     with open("./../../data/companies.pickle", "wb") as f:
         pickle.dump(parse_names, f)

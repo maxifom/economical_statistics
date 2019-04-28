@@ -182,8 +182,10 @@ def predictions():
         prediction["ma_percent"] = list(filter(
             lambda _c: ("name" in _c and _c["name"] == prediction["name"]) or (prediction["name"] in _c["parse_name"]),
             companies_from_file))[0]["ma_parcent"]
+    mean_ma_percent = companies_from_file[0]["mean_ma_percent"]
     predictions = sorted(predictions, key=lambda p: (float(p["percent"]), float(p["true"])), reverse=True)
-    return render_template("predictions.html", predictions=predictions, tr=tr, l=l, perc=perc)
+    return render_template("predictions.html", predictions=predictions, tr=tr, l=l, perc=perc,
+                           mean_ma_percent=mean_ma_percent)
 
 
 @app.route('/all_predictions')

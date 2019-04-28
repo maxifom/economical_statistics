@@ -1,13 +1,9 @@
 version: '3'
 networks:
-  pma:
-    external:
-      name: default_overlay
   backend:
     driver: bridge
   proxy:
-    external: 
-      name: proxy
+    external: true
 volumes:
   mysql:
     driver: local
@@ -43,11 +39,3 @@ services:
       - backend
     ports:
       - 80:5000
- #     - proxy
- #   labels:
- #     traefik.enable: "true"
- #     traefik.port: "5000"
- #     traefik.frontend.passHostHeader: true
- #     traefik.frontend.rule: "Host:economics.maxifom.com"
- #     traefik.frontend.whiteList.useXForwardedFor: "true"
- #     traefik.docker.network: "proxy"
