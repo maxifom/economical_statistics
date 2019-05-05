@@ -1,81 +1,13 @@
 {% extends "template.html" %}
 {% block title %}
-    {% if companies |length >1 %}
-        Companies
-    {% else %}
-        Company {{ companies[0]["name"] }}
-    {% endif %}
+    Companies
 {% endblock %}
 {% block body %}
-    {% if companies |length >1 %}
-        <h1>Companies:</h1>
-    {% endif %}
+    <h1>Companies:</h1>
     {% for c in companies %}
         <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
-            {% if companies |length >1 %}
-                <a href='/companies/{{ c["id"] }}'><h2>{{ c["name"] }}</h2></a>
-            {% else %}
-                <h2>{{ c["name"] }}</h2>
-            {% endif %}
-            <h4>{{ c["full_name"] }} - {{ c["ticker"] }}</h4>
-            {% if c["time"] %}
-                <h5>Last price update: {{ c["time"] }} UTC</h5>
-                <h5>Current price: <span style="color:blue">{{ c["current"] }}</span> RUB</h5>
-                <h5>High price: <span style="color:green">{{ c["high"] }}</span> RUB</h5>
-                <h5>Low price: <span style="color:red">{{ c["low"] }}</span> RUB</h5>
-                <h5>Volume: {{ c["volume"] }} RUB</h5>
-                <h5>Previous Volume: {{ c["volume_previous"] }} RUB</h5>
-            {% endif %}
+            <a href='/company/{{ c.id }}'><h2>{{ c.name }}</h2></a>
+            <h4>{{ c.full_name }} - {{ c.ticker }}</h4>
         </div>
     {% endfor %}
-    {% if companies[0]["news"]|length > 0 %}
-        <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue; max-height:400px; overflow-y: scroll;">
-            <h3>News:</h3>
-            {% for n in companies[0]["news"] %}
-                <a href="/news/{{ n["id"] }}"><h5>News # {{ n["id"] }}</h5></a>
-                <div style="margin-bottom: 5px; border-bottom: 2px solid lightblue">
-                    <p><a href="{{ n['link'] }}">Link</a> {{ n['sent_score'] }} {{ n['word_count'] }}words</p>
-                    <p>{{ n["body"] }}</p>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    {% if coefs %}
-        <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
-            <table class="table table-bordered table-striped table-responsive">
-                <thead>
-                <tr>
-                    <td>
-                        Name
-                    </td>
-                    {% for c in coefs %}
-                        <td>  {{ c }}</td>
-                    {% endfor %}
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>
-                        Coefficient
-                    </td>
-                    {% for _,c in coefs.items() %}
-                        <td title="{{ c }}">  {{ "%.6f"|format(c) }}</td>
-                    {% endfor %}
-
-
-                </tr>
-                <tr>
-                    <td>
-                        PValue
-                    </td>
-                    {% for _,c in pvalues.items() %}
-                        <td title="{{ c }}">  {{ "%.6f"|format(c) }}</td>
-                    {% endfor %}
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    {% endif %}
-
 {% endblock %}

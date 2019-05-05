@@ -1,23 +1,30 @@
-from misc.database import Database
+"""
+    Gets actual price on real-time predictions to calculate accuracy
+"""
+
+from models import Prediction, Price, fn
 
 
-def update_history_predictions():
-    db = Database()
-    db.db.execute("""
-        SELECT * FROM predictions WHERE actual = 0 AND time <=DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY )
-    """)
-    without_actual_predictions = db.db.fetchall()
-    for p in without_actual_predictions:
-        db.db.execute("""
-            SELECT current FROM prices WHERE company_id = %s AND DATE(time) = DATE(%s)+1 ORDER BY id DESC LIMIT 1
-        """, (p["company_id"], p["time"]))
-        current_price = db.db.fetchone()["current"]
-        db.db.execute("""
-            UPDATE predictions SET actual = %s WHERE id = %s
-        """, (current_price, p["id"]))
-        db.connection.commit()
+def update_predictions():
+    predictions = Prediction.select().where(
+        (Prediction.actual == 0))
+    for p in predictions:
+        # Monday = 0, Sunday = 6
+        # If Friday or Saturday or Sunday then search for Monday
+        if 4 <= p.time.weekday() <= 6:
+            price = Price.select(Price.current).where(
+                (Price.time > p.time) & (fn.WEEKDAY(Price.time) == 0) & (Price.company == p.company)).order_by(
+                Price.id.desc()).limit(1)
+        else:
+            price = Price.select(Price.current).where(
+                (Price.time > p.time) & (
+                        fn.WEEKDAY(Price.time) == p.time.weekday() + 1) & Price.company == p.company).order_by(
+                Price.id.desc()).limit(1)
+        price = price[0].current if len(price) > 0 else None
+        if price is not None:
+            p.actual = price
+            p.save()
 
 
 if __name__ == '__main__':
-    # update_actual()
-    update_history_predictions()
+    update_predictions()

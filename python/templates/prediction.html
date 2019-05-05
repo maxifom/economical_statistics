@@ -1,25 +1,25 @@
 {% extends "template.html" %}
 {% block title %}
-    Prediction for company {{ prediction["name"] }}
+    Prediction for company {{ p.company.name }}
 {% endblock %}
 {% block body %}
-    <h1>Prediction for company {{ prediction["name"] }}</h1>
+    <h1>Prediction for company {{ p.company.name }}</h1>
     <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
-        <p>Time of prediction price: {{ "%.5f"|format(prediction["current"]) }} RUB</p>
-        <p>Prediction: {{ "%.5f"|format(prediction["prediction"]) }} RUB</p>
-        {% if prediction["actual"]!=0 %}
-            <p>Actual: {{ "%.5f"|format(prediction["actual"]) }} RUB</p>
+        <p>Time of prediction price: {{ "%.5f"|format(p.current) }} RUB</p>
+        <p>Prediction: {{ "%.5f"|format(p.prediction) }} RUB</p>
+        {% if p.actual!=0 %}
+            <p>Actual: {{ "%.5f"|format(p.actual) }} RUB</p>
         {% endif %}
-        {% if prediction["trend"] %}
+        {% if p.trend %}
             <h4 style="color: forestgreen;">UP ↑</h4>
         {% else %}
             <h4 style="color:lightcoral">DOWN ↓</h4>
         {% endif %}
-        <p>Created: {{ prediction["time"] }}</p>
-        <p>Last update: {{ prediction["updated_at"] }}</p>
+        <p>Created: {{ p.time }}</p>
+        <p>Last update: {{ p.updated_at }}</p>
     </div>
 
-    {% if coefs %}
+    {% if p.company.linear_model.params %}
         <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
             <table class="table table-bordered table-striped table-responsive">
                 <thead>
@@ -27,7 +27,7 @@
                     <td>
                         Name
                     </td>
-                    {% for c in coefs %}
+                    {% for c in p.company.linear_model.params %}
                         <td>  {{ c }}</td>
                     {% endfor %}
                 </tr>
@@ -37,17 +37,15 @@
                     <td>
                         Coefficient
                     </td>
-                    {% for _,c in coefs.items() %}
+                    {% for _,c in p.company.linear_model.params.items() %}
                         <td title="{{ c }}">  {{ "%.6f"|format(c) }}</td>
                     {% endfor %}
-
-
                 </tr>
                 <tr>
                     <td>
                         PValue
                     </td>
-                    {% for _,c in pvalues.items() %}
+                    {% for _,c in p.company.linear_model.pvalues.items() %}
                         <td title="{{ c }}">  {{ "%.6f"|format(c) }}</td>
                     {% endfor %}
                 </tr>
@@ -56,13 +54,13 @@
                         Mean values
                     </td>
                     <td>Not used</td>
-                    <td title="{{ prediction["mean_sent_score"] }}">  {{ "%.6f"|format(prediction["mean_sent_score"]) }}</td>
-                    <td title="{{ prediction["mean_log_return"] }}">  {{ "%.6f"|format(prediction["mean_log_return"]) }}</td>
-                    <td title="{{ prediction["mean_trading_volume"] }}">  {{ "%.6f"|format(prediction["mean_trading_volume"]) }}</td>
-                    <td title="{{ prediction["mean_overnight_variation"] }}">  {{ "%.6f"|format(prediction["mean_overnight_variation"]) }}</td>
-                    <td title="{{ prediction["mean_trading_day_variation"] }}">  {{ "%.6f"|format(prediction["mean_trading_day_variation"]) }}</td>
-                    <td title="{{ prediction["mean_word_count"] }}">  {{ "%.6f"|format(prediction["mean_word_count"]) }}</td>
-                    <td title="{{ prediction["mean_closing_price"] }}">  {{ "%.6f"|format(prediction["mean_closing_price"]) }}</td>
+                    <td title="{{ p.mean_sent_score }}">  {{ "%.6f"|format(p.mean_sent_score) }}</td>
+                    <td title="{{ p.mean_log_return }}">  {{ "%.6f"|format(p.mean_log_return) }}</td>
+                    <td title="{{ p.mean_trading_volume }}">  {{ "%.6f"|format(p.mean_trading_volume) }}</td>
+                    <td title="{{ p.mean_overnight_variation }}">  {{ "%.6f"|format(p.mean_overnight_variation) }}</td>
+                    <td title="{{ p.mean_trading_day_variation }}">  {{ "%.6f"|format(p.mean_trading_day_variation) }}</td>
+                    <td title="{{ p.mean_word_count }}">  {{ "%.6f"|format(p.mean_word_count) }}</td>
+                    <td title="{{ p.mean_closing_price }}">  {{ "%.6f"|format(p.mean_closing_price) }}</td>
                 </tr>
                 </tbody>
             </table>

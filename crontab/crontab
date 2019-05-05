@@ -1,6 +1,4 @@
-*/5 4-18 * * 1-5 cd /usr/src/app/python &&  /usr/local/bin/python ./update_prices.py >> /var/log/cron.log
-2 * * * 1-5 cd /usr/src/app/python/realtime_parsing &&  /usr/local/bin/python ./update_actual.py >> /var/log/cron.log
-0 19 * * 1-5 cd /usr/src/app/python/realtime_parsing &&  /usr/local/bin/python ./parse.py >> /var/log/cron.log
-*/2 * * * 1-5 cd /usr/src/app/python &&  /usr/local/bin/python ./update_news.py >> /var/log/cron.log
-* * * * * cd /usr/src/app/python/history_parsing &&  /usr/local/bin/python ./reparse_history.py >> /var/log/cron.log
- 
+0 19 * * 1-5 cd /usr/src/app/python/realtime_parsing &&  /usr/local/bin/python ./update_prices.py >> /var/log/cron.log
+0 */6 * * 1-5 cd /usr/src/app/python/realtime_parsing &&  /usr/local/bin/python ./update_actual.py >> /var/log/cron.log
+5 19 * * 1-5 cd /usr/src/app/python/realtime_parsing &&  /usr/local/bin/python ./predict.py >> /var/log/cron.log
+*/2 * * * 1-5 cd /usr/src/app/python/realtime_parsing &&  /usr/local/bin/python ./update_news.py >> /var/log/cron.log

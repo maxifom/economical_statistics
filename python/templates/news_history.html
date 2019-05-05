@@ -4,13 +4,13 @@
 {% endblock %}
 {% block body %}
     <div style="display: flex; justify-content: start">
-        {% if page > 10 %}
+        {% if page >= 10 %}
             <a style="margin-right:20px" href="/history/{{ page - 10 }}">Prev 10</a>
         {% endif %}
-        {% if page > 1 %}
+        {% if page > 0 %}
             <a style="margin-right:20px" href="/history/{{ page - 1 }}">Prev</a>
         {% endif %}
-        <h4 style="margin-right:20px">Page # {{ page }}</h4>
+        <h4 style="margin-right:20px">Page # {{ page + 1 }}</h4>
         <a style="margin-right:20px" href="/history/{{ page + 1 }}">Next</a>
         <a href="/history/{{ page + 10 }}">Next 10</a>
     </div>
@@ -18,19 +18,23 @@
     {% for n in news %}
         <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
             <h4>News # {{ n["id"] }}</h4>
+            {% if n["title"] !="0" %}
+                <h3>Title: <b>{{ n["title"] }}</b></h3>
+            {% endif %}
             <h5>{{ n["companies"] }}</h5>
-            {% if n["timestamp"] %}
-                <p><a href="{{ n['url'] }}">Link</a> {{ n['sent_score'] }} {{ n['word_count'] }}words
+            {% if n["date"] %}
+                <p>{{ n["date"] }} UTC</p>
+                <p><a href="{{ n['url'] }}">Link</a> {{ "%.2f"|format(n['sent_score']) }} {{ n['word_count'] }} words
                 </p>
                 <p>{{ n["text"] }}</p>
             {% endif %}
-            {% if n["info"]["sentence"] %}
+            {% if n["parsed_sentence"] %}
                 <p>
-                    Parsed view: {{ n["info"]["sentence"] }}
+                    Parsed view: {{ n["parsed_sentence"] }}
                 </p>
             {% endif %}
         </div>
-        {% if n["info"]["words"] %}
+        {% if n["words"] %}
             <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
                 <h3>Words:</h3>
                 <table class="table table-bordered table-striped table-responsive">
@@ -42,14 +46,12 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for w in n["info"]["words"] %}
-                        {% if w["score"]|float !=0 %}
-                            <tr>
-                                <td>{{ w["word"] }}</td>
-                                <td>{{ w["score"] }}</td>
-                                <td>{{ w["count"] }}</td>
-                            </tr>
-                        {% endif %}
+                    {% for w in n["words"] %}
+                        <tr>
+                            <td>{{ w["word"] }}</td>
+                            <td>{{ w["score"] }}</td>
+                            <td>{{ w["count"] }}</td>
+                        </tr>
                     {% endfor %}
 
                     </tbody>
@@ -58,13 +60,13 @@
         {% endif %}
     {% endfor %}
     <div style="display: flex; justify-content: start">
-        {% if page > 10 %}
+        {% if page >= 10 %}
             <a style="margin-right:20px" href="/history/{{ page - 10 }}">Prev 10</a>
         {% endif %}
-        {% if page > 1 %}
+        {% if page > 0 %}
             <a style="margin-right:20px" href="/history/{{ page - 1 }}">Prev</a>
         {% endif %}
-        <h4 style="margin-right:20px">Page # {{ page }}</h4>
+        <h4 style="margin-right:20px">Page # {{ page + 1 }}</h4>
         <a style="margin-right:20px" href="/history/{{ page + 1 }}">Next</a>
         <a href="/history/{{ page + 10 }}">Next 10</a>
     </div>

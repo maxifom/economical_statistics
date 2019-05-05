@@ -1,60 +1,40 @@
 {% extends "template.html" %}
 {% block title %}
-    {% if news |length >1 %}
-        News
-    {% else %}
-        News # {{ news[0]["id"] }}
-    {% endif %}
+    News
 {% endblock %}
 {% block body %}
-    {% if news |length >1 %}
-        <h1>News:</h1>
-    {% endif %}
+    <div style="display: flex; justify-content: start">
+        {% if page >= 10 %}
+            <a style="margin-right:20px" href="/news/{{ page - 10 }}">Prev 10</a>
+        {% endif %}
+        {% if page > 0 %}
+            <a style="margin-right:20px" href="/news/{{ page - 1 }}">Prev</a>
+        {% endif %}
+        <h4 style="margin-right:20px">Page # {{ page + 1 }}</h4>
+        <a style="margin-right:20px" href="/news/{{ page + 1 }}">Next</a>
+        <a href="/news/{{ page + 10 }}">Next 10</a>
+    </div>
+    <h1>News:</h1>
     {% for n in news %}
         <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
-            {% if news |length >1 %}
-                <a href='/news/{{ n["id"] }}'><h2>News # {{ n["id"] }} </h2></a>
-                <a href="/companies/{{ n['c_id'] }}"><h5>{{ n["company"] }}</h5></a>
-            {% else %}
-                <a href="/companies/{{ n['c_id'] }}"><h2>News for {{ n["company"] }}</h2></a>
-            {% endif %}
-            {% if n["time"] %}
-                <h5>News time: {{ n["time"] }} UTC</h5>
-                <p><a href="{{ n['link'] }}">Link</a> {{ n['sent_score'] }} {{ n['word_count'] }}words</p>
-                <p>{{ n["body"] }}</p>
+            <a href='/news/{{ n.id }}'><h2>News # {{ n.id }} </h2></a>
+            <a href="/company/{{ n.company.id }}"><h5>{{ n.company.name }}</h5></a>
+            {% if n.time %}
+                <h5>News time: {{ n.time }} UTC</h5>
+                <p><a href="{{ n.link }}">Link</a> {{ "%.2f"|format(n.sent_score) }} {{ n.word_count }}words</p>
+                <p>{{ n.body }}</p>
             {% endif %}
         </div>
     {% endfor %}
-    {% if info["sentence"] %}
-        <p>
-            Parsed view: {{ info["sentence"] }}
-        </p>
-    {% endif %}
-    {% if info["words"] %}
-        <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
-            <h3>Words:</h3>
-            <table class="table table-bordered table-striped table-responsive">
-                <thead>
-                <tr>
-                    <td>Word</td>
-                    <td>Score</td>
-                    <td>Count</td>
-                </tr>
-                </thead>
-                <tbody>
-                {% for w in info["words"] %}
-                    {% if w["score"]|float !=0 %}
-                        <tr>
-                            <td>{{ w["word"] }}</td>
-                            <td>{{ w["score"] }}</td>
-                            <td>{{ w["count"] }}</td>
-                        </tr>
-                    {% endif %}
-                {% endfor %}
-
-                </tbody>
-            </table>
-        </div>
-    {% endif %}
-
+    <div style="display: flex; justify-content: start">
+        {% if page >= 10 %}
+            <a style="margin-right:20px" href="/news/{{ page - 10 }}">Prev 10</a>
+        {% endif %}
+        {% if page > 0 %}
+            <a style="margin-right:20px" href="/news/{{ page - 1 }}">Prev</a>
+        {% endif %}
+        <h4 style="margin-right:20px">Page # {{ page + 1 }}</h4>
+        <a style="margin-right:20px" href="/news/{{ page + 1 }}">Next</a>
+        <a href="/news/{{ page + 10 }}">Next 10</a>
+    </div>
 {% endblock %}

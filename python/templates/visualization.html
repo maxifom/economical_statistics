@@ -1,0 +1,513 @@
+{% extends "template.html" %}
+{% block title %}
+    Dictionary and word cloud
+{% endblock %}
+
+{% block body %}
+    <div>
+        <h3>Linreg Model trained on data from Jan 1 2016 to Apr 3 2019:</h3>
+        <table class="table table-responsive table-striped table-sm">
+            <thead>
+            <tr>
+                <th>Company</th>
+                <th>Train accuracy</th>
+                <th>Test accuracy</th>
+                <th>Train value loss (%)*</th>
+                <th>Test value loss (%)*</th>
+                <th>Price Graph</th>
+                <th>Acc Graph</th>
+                <th>Val loss Graphs (%)</th>
+            </tr>
+            </thead>
+            <tfoot>
+            <th>* - Percent from mean close price</th>
+            </tfoot>
+            <tbody>
+            {% for c in companies %}
+                <tr>
+                    <td>{{ c.name }}</td>
+                    <td title="{{ c.linear_model.train_acc }}">{{ "%.2f" | format(c.linear_model.train_acc*100) }}%</td>
+                    <td title="{{ c.linear_model.test_acc }}">{{ "%.2f" | format(c.linear_model.test_acc*100) }}%</td>
+                    <td title="{{ c.linear_model.train_val_loss }}({{ c.linear_model.train_val_loss_percent }})">{{ "%.4f"|format(c.linear_model.train_val_loss) }}({{ "%.2f"|format(c.linear_model.train_val_loss_percent*100) }}%)</td>
+                    <td title="{{ c.linear_model.test_val_loss }}({{ c.linear_model.test_val_loss_percent }})">{{ "%.4f"|format(c.linear_model.test_val_loss) }}({{ "%.2f"|format(c.linear_model.test_val_loss_percent*100) }}%)
+                    </td>
+                    <td><a href="/graphs/linreg/price/{{ c.ticker }}.png">Graph</a></td>
+                    <td><a href="/graphs/linreg/acc/{{ c.ticker }}.png">Graph</a></td>
+                    <td><a href="/graphs/linreg/val_loss/{{ c.ticker }}.png">Graph</a> <a
+                            href="/graphs/linreg/val_loss_pct/{{ c.ticker }}.png">(%)</a></td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        <h3>ARIMA Model trained on data from Jan 1 2016 to Apr 3 2019:</h3>
+        <table class="table table-responsive table-striped table-sm">
+            <thead>
+            <tr>
+                <th>Company</th>
+                <th>Train value loss (%)*</th>
+                <th>Test value loss (%)*</th>
+                <th>Price Graph</th>
+                <th>Acc Graph</th>
+                <th>Val loss Graphs (%)</th>
+            </tr>
+            </thead>
+            <tfoot>
+            <th>* - Percent from mean close price</th>
+            </tfoot>
+            <tbody>
+            {% for c in companies %}
+                <tr>
+                    <td>{{ c.name }}</td>
+                    <td title="{{ c.arima_model.test_acc }}">{{ "%.2f" | format(c.arima_model.test_acc*100) }}%</td>
+                    <td title="{{ c.arima_model.test_val_loss }}({{ c.arima_model.test_val_loss_percent }})">{{ "%.4f"|format(c.arima_model.test_val_loss) }}({{ "%.2f"|format(c.arima_model.test_val_loss_percent*100) }}%)
+                    </td>
+                    <td><a href="/graphs/arima/price/{{ c.ticker }}.png">Graph</a></td>
+                    <td><a href="/graphs/arima/acc/{{ c.ticker }}.png">Graph</a></td>
+                    <td><a href="/graphs/arima/val_loss/{{ c.ticker }}.png">Graph</a> <a
+                            href="/graphs/arima/val_loss_pct/{{ c.ticker }}.png">(%)</a></td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        <h3>Comaprison of 2 models ( Linreg - ARIMA )</h3>
+        <table class="table table-responsive table-striped table-sm">
+            <thead>
+            <tr>
+                <th>Company</th>
+                <th>Train value loss (%)*</th>
+                <th>Test value loss (%)*</th>
+                <th>Price Graph</th>
+                <th>Acc Graph</th>
+                <th>Val loss Graphs (%)</th>
+            </tr>
+            </thead>
+            <tfoot>
+            <th>* - Percent from mean close price</th>
+            </tfoot>
+            <tbody>
+            {% for c in companies %}
+                <tr>
+                    <td>{{ c.name }}</td>
+                    <td title="{{ c.linear_model.test_acc-c.arima_model.test_acc }}">
+                        {{ "%.2f" | format(c.linear_model.test_acc*100-c.arima_model.test_acc*100) }}%
+                    </td>
+                    <td title="{{ c.linear_model.test_val_loss-c.arima_model.test_val_loss }}({{ c.linear_model.test_val_loss_percent-c.arima_model.test_val_loss_percent }})">
+                        {{ "%.4f"|format(c.linear_model.test_val_loss-c.arima_model.test_val_loss) }}({{ "%.2f"|format(c.linear_model.test_val_loss_percent*100-c.arima_model.test_val_loss_percent*100) }}%)
+                    </td>
+                    <td><a href="/graphs/comparison/price/{{ c.ticker }}.png">Graph</a></td>
+                    <td><a href="/graphs/comparison/acc/{{ c.ticker }}.png">Graph</a></td>
+                    <td><a href="/graphs/comparison/val_loss/{{ c.ticker }}.png">Graph</a> <a
+                            href="/graphs/comparison/val_loss_pct/{{ c.ticker }}.png">(%)</a></td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+
+
+
+
+    <div>
+        <h1>Word Cloud:</h1>
+        <div class="cloud"></div>
+        <div class="pcloud"></div>
+        <div class="ncloud"></div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.min.js"></script>
+    <script>
+        var neg_words = JSON.parse('{{ neg_words | tojson }}');
+        var nwords = Object.keys(neg_words)
+            .map(function (d, i) {
+                //console.log(d);
+                return {text: d, size: neg_words[d]};
+            });
+        var fillColor = "#ff2a28";
+        var fontName = "Impact",
+            cWidth = 1000,
+            cHeight = 600,
+            svg,
+            wCloud,
+            bbox,
+            ctm,
+            bScale,
+            bWidth,
+            bHeight,
+            bMidX,
+            bMidY,
+            bDeltaX,
+            bDeltaY;
+
+        var cTemp = document.createElement('canvas'),
+            ctx = cTemp.getContext('2d');
+        ctx.font = "100px " + fontName;
+
+        var fRatio = Math.min(cWidth, cHeight) / ctx.measureText(nwords[0].text).width,
+            fontScale = d3.scale.linear()
+                .domain([
+                    d3.min(nwords, function (d) {
+                        return d.size;
+                    }),
+                    d3.max(nwords, function (d) {
+                        return d.size;
+                    })
+                ])
+                //.range([20,120]),
+                .range([20, 100 * fRatio / 2]), // tbc
+            fill = d3.scale.category20();
+
+        d3.layout.cloud()
+            .size([cWidth, cHeight])
+            .words(nwords)
+            //.padding(2) // controls
+            .rotate(function () {
+                return ~~(Math.random() * 2) * 90;
+            })
+            .font(fontName)
+            .fontSize(function (d) {
+                return fontScale(d.size)
+            })
+            .on("end", drawN)
+            .start();
+
+        function drawN(words, bounds) {
+            // move and scale cloud bounds to canvas
+            // bounds = [{x0, y0}, {x1, y1}]
+            bWidth = bounds[1].x - bounds[0].x;
+            bHeight = bounds[1].y - bounds[0].y;
+            bMidX = bounds[0].x + bWidth / 2;
+            bMidY = bounds[0].y + bHeight / 2;
+            bDeltaX = cWidth / 2 - bounds[0].x + bWidth / 2;
+            bDeltaY = cHeight / 2 - bounds[0].y + bHeight / 2;
+            bScale = bounds ? Math.min(cWidth / bWidth, cHeight / bHeight) : 1;
+
+            console.log(
+                "bounds (" + bounds[0].x +
+                ", " + bounds[0].y +
+                ", " + bounds[1].x +
+                ", " + bounds[1].y +
+                "), width " + bWidth +
+                ", height " + bHeight +
+                ", mid (" + bMidX +
+                ", " + bMidY +
+                "), delta (" + bDeltaX +
+                ", " + bDeltaY +
+                "), scale " + bScale
+            );
+
+            // the library's bounds seem not to correspond to reality?
+            // try using .getBBox() instead?
+
+            svg = d3.select(".ncloud").append("svg")
+                .attr("width", cWidth)
+                .attr("height", cHeight);
+
+            wCloud = svg.append("g")
+            //.attr("transform", "translate(" + [bDeltaX, bDeltaY] + ") scale(" + 1 + ")") // nah!
+                .attr("transform", "translate(" + [bWidth >> 1, bHeight >> 1] + ") scale(" + bScale + ")") // nah!
+                .selectAll("text")
+                .data(words)
+                .enter().append("text")
+                .style("font-size", function (d) {
+                    return d.size + "px";
+                })
+                .style("font-family", fontName)
+                .style("fill", fillColor)
+                .attr("text-anchor", "middle")
+                .transition()
+                .duration(600)
+                .attr("transform", function (d) {
+                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                })
+                .text(function (d) {
+                    return d.text;
+                });
+
+            // TO DO: function to find min and max x,y of all words
+            // and use it as the group's bbox
+            // then do the transformation
+            bbox = wCloud.node(0).getBBox();
+            //ctm = wCloud.node().getCTM();
+            console.log(
+                "bbox (x: " + bbox.x +
+                ", y: " + bbox.y +
+                ", w: " + bbox.width +
+                ", h: " + bbox.height +
+                ")"
+            );
+
+        };
+    </script>
+    <script>
+        var pos_words = JSON.parse('{{ pos_words | tojson }}');
+        var pwords = Object.keys(pos_words)
+            .map(function (d, i) {
+                //console.log(d);
+                return {text: d, size: pos_words[d]};
+            });
+        var fillColor = "#54b42f";
+        var fontName = "Impact",
+            cWidth = 1000,
+            cHeight = 600,
+            svg,
+            wCloud,
+            bbox,
+            ctm,
+            bScale,
+            bWidth,
+            bHeight,
+            bMidX,
+            bMidY,
+            bDeltaX,
+            bDeltaY;
+
+        var cTemp = document.createElement('canvas'),
+            ctx = cTemp.getContext('2d');
+        ctx.font = "100px " + fontName;
+
+        var fRatio = Math.min(cWidth, cHeight) / ctx.measureText(pwords[0].text).width,
+            fontScale = d3.scale.linear()
+                .domain([
+                    d3.min(pwords, function (d) {
+                        return d.size;
+                    }),
+                    d3.max(pwords, function (d) {
+                        return d.size;
+                    })
+                ])
+                //.range([20,120]),
+                .range([20, 100 * fRatio / 2]), // tbc
+            fill = d3.scale.category20();
+
+        d3.layout.cloud()
+            .size([cWidth, cHeight])
+            .words(pwords)
+            //.padding(2) // controls
+            .rotate(function () {
+                return ~~(Math.random() * 2) * 90;
+            })
+            .font(fontName)
+            .fontSize(function (d) {
+                return fontScale(d.size)
+            })
+            .on("end", drawP)
+            .start();
+
+        function drawP(words, bounds) {
+            // move and scale cloud bounds to canvas
+            // bounds = [{x0, y0}, {x1, y1}]
+            bWidth = bounds[1].x - bounds[0].x;
+            bHeight = bounds[1].y - bounds[0].y;
+            bMidX = bounds[0].x + bWidth / 2;
+            bMidY = bounds[0].y + bHeight / 2;
+            bDeltaX = cWidth / 2 - bounds[0].x + bWidth / 2;
+            bDeltaY = cHeight / 2 - bounds[0].y + bHeight / 2;
+            bScale = bounds ? Math.min(cWidth / bWidth, cHeight / bHeight) : 1;
+
+            console.log(
+                "bounds (" + bounds[0].x +
+                ", " + bounds[0].y +
+                ", " + bounds[1].x +
+                ", " + bounds[1].y +
+                "), width " + bWidth +
+                ", height " + bHeight +
+                ", mid (" + bMidX +
+                ", " + bMidY +
+                "), delta (" + bDeltaX +
+                ", " + bDeltaY +
+                "), scale " + bScale
+            );
+
+            // the library's bounds seem not to correspond to reality?
+            // try using .getBBox() instead?
+
+            svg = d3.select(".pcloud").append("svg")
+                .attr("width", cWidth)
+                .attr("height", cHeight);
+
+            wCloud = svg.append("g")
+            //.attr("transform", "translate(" + [bDeltaX, bDeltaY] + ") scale(" + 1 + ")") // nah!
+                .attr("transform", "translate(" + [bWidth >> 1, bHeight >> 1] + ") scale(" + bScale + ")") // nah!
+                .selectAll("text")
+                .data(words)
+                .enter().append("text")
+                .style("font-size", function (d) {
+                    return d.size + "px";
+                })
+                .style("font-family", fontName)
+                .style("fill", fillColor)
+                .attr("text-anchor", "middle")
+                .transition()
+                .duration(600)
+                .attr("transform", function (d) {
+                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                })
+                .text(function (d) {
+                    return d.text;
+                });
+
+            // TO DO: function to find min and max x,y of all words
+            // and use it as the group's bbox
+            // then do the transformation
+            bbox = wCloud.node(0).getBBox();
+            //ctm = wCloud.node().getCTM();
+            console.log(
+                "bbox (x: " + bbox.x +
+                ", y: " + bbox.y +
+                ", w: " + bbox.width +
+                ", h: " + bbox.height +
+                ")"
+            );
+
+        };
+    </script>
+    <script>
+        var all_words = JSON.parse('{{ all_words | tojson }}');
+
+
+        var words = Object.keys(all_words)
+            .map(function (d, i) {
+                //console.log(d);
+                color = all_words[d] > 0 ? "#54b42f" : "#ff2a28";
+
+                return {text: d, size: all_words[d], color: color};
+            });
+        var fillColor = "#000000";
+        var fontName = "Impact",
+            cWidth = 1000,
+            cHeight = 600,
+            svg,
+            wCloud,
+            bbox,
+            ctm,
+            bScale,
+            bWidth,
+            bHeight,
+            bMidX,
+            bMidY,
+            bDeltaX,
+            bDeltaY;
+
+        var cTemp = document.createElement('canvas'),
+            ctx = cTemp.getContext('2d');
+        ctx.font = "100px " + fontName;
+
+        var fRatio = Math.min(cWidth, cHeight) / ctx.measureText(words[0].text).width,
+            fontScale = d3.scale.linear()
+                .domain([
+                    d3.min(words, function (d) {
+                        return d.size;
+                    }),
+                    d3.max(words, function (d) {
+                        return d.size;
+                    })
+                ])
+                //.range([20,120]),
+                .range([20, 100 * fRatio / 2]), // tbc
+            fill = d3.scale.category20();
+
+        d3.layout.cloud()
+            .size([cWidth, cHeight])
+            .words(words)
+            //.padding(2) // controls
+            .rotate(function () {
+                return ~~(Math.random() * 2) * 90;
+            })
+            .font(fontName)
+            .fontSize(function (d) {
+                return fontScale(d.size)
+            })
+            .on("end", draw)
+            .start();
+
+        function draw(words, bounds) {
+            // move and scale cloud bounds to canvas
+            // bounds = [{x0, y0}, {x1, y1}]
+            bWidth = bounds[1].x - bounds[0].x;
+            bHeight = bounds[1].y - bounds[0].y;
+            bMidX = bounds[0].x + bWidth / 2;
+            bMidY = bounds[0].y + bHeight / 2;
+            bDeltaX = cWidth / 2 - bounds[0].x + bWidth / 2;
+            bDeltaY = cHeight / 2 - bounds[0].y + bHeight / 2;
+            bScale = bounds ? Math.min(cWidth / bWidth, cHeight / bHeight) : 1;
+
+            console.log(
+                "bounds (" + bounds[0].x +
+                ", " + bounds[0].y +
+                ", " + bounds[1].x +
+                ", " + bounds[1].y +
+                "), width " + bWidth +
+                ", height " + bHeight +
+                ", mid (" + bMidX +
+                ", " + bMidY +
+                "), delta (" + bDeltaX +
+                ", " + bDeltaY +
+                "), scale " + bScale
+            );
+
+            // the library's bounds seem not to correspond to reality?
+            // try using .getBBox() instead?
+
+            svg = d3.select(".cloud").append("svg")
+                .attr("width", cWidth)
+                .attr("height", cHeight);
+
+            wCloud = svg.append("g")
+            //.attr("transform", "translate(" + [bDeltaX, bDeltaY] + ") scale(" + 1 + ")") // nah!
+                .attr("transform", "translate(" + [bWidth >> 1, bHeight >> 1] + ") scale(" + bScale + ")") // nah!
+                .selectAll("text")
+                .data(words)
+                .enter().append("text")
+                .style("font-size", function (d) {
+                    return d.size + "px";
+                })
+                .style("font-family", fontName)
+                .style("fill", function (d, i) {
+                    return d["color"]
+                })
+                .attr("text-anchor", "middle")
+                .transition()
+                .duration(600)
+                .attr("transform", function (d) {
+                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                })
+                .text(function (d) {
+                    return d.text;
+                });
+
+            // TO DO: function to find min and max x,y of all words
+            // and use it as the group's bbox
+            // then do the transformation
+            bbox = wCloud.node(0).getBBox();
+            //ctm = wCloud.node().getCTM();
+            console.log(
+                "bbox (x: " + bbox.x +
+                ", y: " + bbox.y +
+                ", w: " + bbox.width +
+                ", h: " + bbox.height +
+                ")"
+            );
+
+        };
+
+        function sortByFrequency(arr) {
+            var f = {};
+            arr.forEach(function (i) {
+                f[i] = 0;
+            });
+            var u = arr.filter(function (i) {
+                return ++f[i] == 1;
+            });
+            return u.sort(function (a, b) {
+                return f[b] - f[a];
+            });
+        }</script>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "template.html" %}
+{% block title %}
+    Company {{ company.name }}
+{% endblock %}
+{% block body %}
+    <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
+        <h2>{{ company.name }}</h2>
+        <h4>{{ company.full_name }} - {{ company.ticker }}</h4>
+        <h5>Last price update: {{ company.price.time }} UTC</h5>
+        <h5>Current price: <span style="color:blue">{{ company.price.current }}</span> RUB</h5>
+        <h5>High price: <span style="color:green">{{ company.price.high }}</span> RUB</h5>
+        <h5>Low price: <span style="color:red">{{ company.price.low }}</span> RUB</h5>
+        <h5>Volume: {{ company.price.volume }} RUB</h5>
+        <h5>Previous Volume: {{ company.price.volume_previous }} RUB</h5>
+    </div>
+    {% if company.news %}
+        <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue; max-height:400px; overflow-y: scroll;">
+            <h3>News:</h3>
+            {% for n in company.news %}
+                <a href="/news/{{ n.id }}"><h5>News # {{ n.id }}</h5></a>
+                <div style="margin-bottom: 5px; border-bottom: 2px solid lightblue">
+                    <p><a href="{{ n.link }}">Link</a> {{ "%.2f"|format(n.sent_score) }} {{ n.word_count }} words</p>
+                    <p>{{ n.body }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
+        <p title="{{ company.linear_model.fvalue }}({{ company.linear_model.f_pvalue }})">F-statistics (Prob.
+            F-statistics): {{ "%.3f"|format( company.linear_model.fvalue) }}
+            ({{ "%.3f"|format(company.linear_model.f_pvalue) }})</p>
+        <p title="{{ company.linear_model.aic }}">AIC: {{ "%.3f"|format(company.linear_model.aic) }}</p>
+        <p title="{{ company.linear_model.bic }}">BIC: {{ "%.3f"|format(company.linear_model.bic) }}</p>
+        <p title="{{ company.linear_model.rsquared }}">R<sup>2</sup>: {{ "%.3f"|format(company.linear_model.rsquared) }}</p>
+        <table class="table table-bordered table-striped table-responsive">
+            <thead>
+            <tr>
+                <td>
+                    Name
+                </td>
+                {% for c in company.linear_model.params %}
+                    <td>  {{ c }}</td>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    Coefficient
+                </td>
+                {% for _,c in company.linear_model.params.items() %}
+                    <td title="{{ c }}">  {{ "%.6f"|format(c) }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>
+                    PValue
+                </td>
+                {% for _,c in company.linear_model.pvalues.items() %}
+                    <td title="{{ c }}">  {{ "%.6f"|format(c) }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>
+                    TValue
+                </td>
+                {% for _,c in company.linear_model.tvalues.items() %}
+                    <td title="{{ c }}">  {{ "%.6f"|format(c) }}</td>
+                {% endfor %}
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

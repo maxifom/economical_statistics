@@ -1,2 +1,4 @@
 .env
 windows_packages
+*.rar
+data

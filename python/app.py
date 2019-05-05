@@ -1,13 +1,11 @@
-import os
-import pickle
+import json
 
 import pandas as pd
-from flask import Flask, render_template, request, redirect
-from misc.add_to_dictionary import positive_from_txt, negative_from_txt
-from misc.database import Database
-from misc.analysis import sentence_info
-from realtime_parsing.parse import predict
-from realtime_parsing import update_actual
+from flask import Flask, render_template, request, redirect, make_response, send_from_directory
+from misc.add_to_dictionary import add_words_from_txt, process_lines, process_line
+from models.models import *
+from realtime_parsing.predict import predict
+from realtime_parsing.update_actual import update_predictions
 
 app = Flask(__name__)
 
@@ -18,225 +16,197 @@ def hello():
 
 
 @app.route("/companies")
-@app.route("/companies/<company>")
-def companies(company=None):
-    db = Database()
-    coefs = None
-    pvalues = None
-    if company is None:
-        cs = db.get_all_companies()
-    else:
-        cs = db.get_company_by_id_with_price(company)
-        with open('./../data/companies.pickle', 'rb') as f:
-            companies = pickle.load(f)
-        l = list(filter(lambda c: c["ticker"] == cs[0]["ticker"], companies))
-        if len(l) > 0:
-            c = l[0]
-            coefs = c["coef"]
-            pvalues = c['pvalues']
-        else:
-            coefs = None
-            pvalues = None
-    return render_template('companies.html', companies=cs, coefs=coefs, pvalues=pvalues)
+def companies():
+    companies = Company.select()
+    return render_template('companies.html', companies=companies)
+
+
+@app.route("/company/<id>")
+def company(id=1):
+    company = Company.get(Company.id == id)
+    price = Price.select().order_by(Price.id.desc()).where(Price.company == company.id).get()
+    company.price = price
+    news = News.select().where(News.company == company.id).order_by(News.id.desc())
+    company.news = news
+    company.linear_model = json.loads(company.linear_model)
+    return render_template('company.html', company=company)
 
 
 @app.route("/news")
-@app.route("/news/<n>")
-def news(n=None):
-    db = Database()
-    info = None
-    if n is None:
-        ns = db.get_all_news()
-    else:
-        ns = db.get_news_by_id(n)
-        with open('./../data/news_' + str(n) + '_words', 'rb') as f:
-            info = pickle.load(f)
-    return render_template('news.html', news=ns, info=info)
+@app.route("/news/<page>")
+def news(page=0):
+    page = int(page)
+    ns = News.select(News, Company).join(Company).order_by(News.id.desc()).limit(10).offset(page * 10)
+    return render_template('news.html', news=ns, page=page)
 
 
-@app.route("/dict", methods=["GET", "POST"])
-def dict():
-    if request.method == 'POST':
-        f = request.files['file']
-        type = request.form['type']
-        if type == 'positive':
-            f.save('./positive.txt')
-            positive_from_txt('./positive.txt')
-        elif type == 'negative':
-            f.save('./negative.txt')
-            negative_from_txt('./negative.txt')
-        return redirect('/dict')
-    else:
-        percents = None
-        if os.path.exists('./../data/result.pickle'):
-            with open('./../data/result.pickle', 'rb') as f:
-                percents = pickle.load(f)
-        percents['values'] = sorted(percents['values'], key=lambda p: p["percent"])
-        db = Database()
-        db.db.execute("""
-            SELECT * FROM words ORDER BY id DESC
-        """)
-        dict = db.db.fetchall()
-        if os.path.exists('./is_parsing'):
-            with open('./is_parsing', 'r') as f:
-                if f.read() == '1':
-                    status = 'parsing'
-                else:
-                    status = 'not parsing'
+@app.route("/news/<id>")
+def news_single(id=1):
+    news = News.get(News.id == id)
+    news.words = json.loads(news.words)
+    return render_template('news_single.html', news=news)
+
+
+@app.route("/add_words", methods=["POST"])
+def add_words():
+    resp = make_response(redirect('/dict'))
+    # Check code and type
+    if "code" in request.form and request.form["code"] == os.environ.get("DELETE_CODE"):
+        if "type" in request.form:
+            type = request.form["type"]
+            is_positive = 1 if type == "positive" else 0
+            resp.set_cookie('code', request.form["code"])
         else:
-            status = 'not parsing'
-        with open("./../data/word_cloud_data", "rb") as f:
-            words = pickle.load(f)
-        return render_template('dict.html', dict=dict, status=status, percents=percents, all_words=words[0],
-                               pos_words=words[1], neg_words=words[2])
+            return resp
+    else:
+        return resp
+    # From textarea
+    if "text" in request.form and request.form["text"].replace(" ", "") != "":
+        text = request.form["text"]
+        lines = text.split("\n")
+        process_lines(lines, is_positive)
+        return resp
+    # From file
+    elif "file" in request.files and request.files['file'].filename != '':
+        f = request.files['file']
+        f.save('./words.txt')
+        add_words_from_txt('./words.txt', is_positive)
+        os.remove('./words.txt')
+        return resp
+    # Single word
+    elif "single_word" in request.form and request.form["single_word"] != "":
+        process_line(request.form["single_word"], is_positive)
+        return resp
+    return resp
+
+
+@app.route("/visualization")
+def visualization():
+    companies = Company.select()
+    for c in companies:
+        c.linear_model = json.loads(c.linear_model)
+        c.arima_model = json.loads(c.arima_model)
+    with open("./../data/word_cloud/word_cloud.json", "r") as file:
+        word_cloud = json.load(file)
+    return render_template('visualization.html',
+                           companies=companies,
+                           all_words=word_cloud["all_words"],
+                           pos_words=word_cloud["positive_words"], neg_words=word_cloud["negative_words"])
+
+
+@app.route("/dict", methods=["GET"])
+def dict():
+    words = Word.select().order_by(Word.id.desc())
+    with open("./../data/word_cloud/word_cloud.json", "r") as file:
+        word_cloud = json.load(file)
+    return render_template('dict.html', words=words,
+                           all_words=word_cloud["all_words"],
+                           pos_words=word_cloud["positive_words"], neg_words=word_cloud["negative_words"])
 
 
 @app.route("/delete", methods=["POST"])
 def delete():
-    if request.method == "POST":
-        db = Database()
+    resp = make_response(redirect('/dict'))
+    if "code" in request.form and request.form["code"] == os.environ.get("DELETE_CODE") and "id" in \
+            request.form:
         id = request.form["id"]
-        db.db.execute("""DELETE FROM words WHERE id = %s""", (id,))
-        db.connection.commit()
-        return redirect('/dict')
-    else:
-        return ''
-
-
-@app.route("/reparse", methods=["POST"])
-def reparse():
-    if request.method == "POST":
-        if os.path.exists('./is_parsing'):
-            with open('./is_parsing', 'r') as file:
-                if int(file.read()) != 1:
-                    with open('./is_parsing', 'w') as file:
-                        file.write(str(1))
-                    with open('./need_parsing', 'w') as file:
-                        file.write(str(1))
-                    return 'Parsing started'
-                else:
-                    return 'Already parsing'
-        else:
-            with open('./is_parsing', 'w') as file:
-                file.write(str(1))
-            with open('./need_parsing', 'w') as file:
-                file.write(str(1))
-            return 'Parsing started'
-    else:
-        return ''
+        Word.get_by_id(id).delete_instance()
+        resp.set_cookie('code', request.form["code"])
+    return resp
 
 
 @app.route('/history')
 @app.route('/history/<page>')
 def history(page=0):
-    df = pd.read_csv('./../data/news_with_one_company_sent_scores.csv')
-    df_dict = df.to_dict(orient='rows')
     page = int(page)
-    ns = df_dict[page * 10:page * 10 + 10]
-    for i in range(0, len(ns)):
-        ns[i]["info"] = sentence_info(ns[i]["text"])
-        ns[i]["id"] = page * 10 + i
-    return render_template("news_history.html", news=ns, page=page)
+    df = pd.read_csv('./../data/news/news_with_one_company_and_sentiment_analysis.csv',
+                     skiprows=range(1, page * 10),
+                     nrows=10)
+    df.title.fillna("0", inplace=True)
+    news = df.to_dict(orient='rows')
+    id = page * 10 + 1
+    for n in news:
+        n["words"] = json.loads(n["words"].replace("'", '"'))
+        n["id"] = id
+        n["date"] = datetime.datetime.utcfromtimestamp(n["timestamp"])
+        id += 1
+    return render_template("news_history.html", news=news, page=page)
 
 
 @app.route('/predictions')
 def predictions():
-    db = Database()
-    db.db.execute("""SELECT * FROM companies""")
-    companies = db.db.fetchall()
+    companies = Company.select()
     predictions = list()
     tr = 0
     l = 0
-    with open("./../data/companies.pickle", 'rb') as c_file:
-        companies_from_file = pickle.load(c_file)
+    perc = 0
     for c in companies:
-        db.db.execute("""
-            SELECT predictions.prediction,actual,time,current, updated_at,predictions.id,companies.name FROM predictions INNER JOIN companies ON predictions.company_id = companies.id WHERE predictions.company_id=%s ORDER BY predictions.id DESC LIMIT 1  
-        """, (c["id"],))
-        prediction = db.db.fetchone()
+        prediction = Prediction.select(Prediction, Company).join(Company).where(
+            Prediction.company == c.id).order_by(
+            Prediction.id.desc).limit(1)
+        prediction = prediction[0] if len(prediction) > 0 else None
         if prediction is None:
             continue
-        prediction["trend"] = float(prediction["prediction"]) > float(prediction["current"])
+        prediction.trend = float(prediction.prediction) > float(prediction.current)
         predictions.append(prediction)
-        db.db.execute("""
-            SELECT prediction, actual, current FROM predictions WHERE company_id = %s AND actual != 0
-        """, (c["id"],))
-        d = db.db.fetchall()
-        prediction["count"] = len(d)
-        prediction["true"] = 0
-        for _d in d:
-            first = _d["prediction"] > _d["current"]
-            second = _d["actual"] > _d["current"]
+        company_predictions = Prediction.select(Prediction).where(
+            (Prediction.company == c.id) & (Prediction.actual != 0))
+        prediction.count = len(company_predictions)
+        prediction.true = 0
+        for p in company_predictions:
+            first = p.prediction > p.current
+            second = p.actual > p.current
             if first == second:
-                prediction["true"] += 1
-        if prediction["count"] == 0:
-            prediction["percent"] = "0"
+                prediction.true += 1
+        if prediction.count == 0:
+            prediction.percent = "0"
         else:
-            prediction["percent"] = "{0:.2f}".format(prediction["true"] / prediction["count"] * 100)
-        tr += prediction["true"]
-        l += prediction["count"]
-        if l == 0:
-            perc = 0
-        else:
+            prediction.percent = "{0:.2f}".format(prediction.true / prediction.count * 100)
+        tr += prediction.true
+        l += prediction.count
+        if l != 0:
             perc = "{0:.2f}".format(tr / l * 100)
-        prediction["ma_percent"] = list(filter(
-            lambda _c: ("name" in _c and _c["name"] == prediction["name"]) or (prediction["name"] in _c["parse_name"]),
-            companies_from_file))[0]["ma_parcent"]
-    mean_ma_percent = companies_from_file[0]["mean_ma_percent"]
-    predictions = sorted(predictions, key=lambda p: (float(p["percent"]), float(p["true"])), reverse=True)
-    return render_template("predictions.html", predictions=predictions, tr=tr, l=l, perc=perc,
-                           mean_ma_percent=mean_ma_percent)
+    predictions = sorted(predictions, key=lambda p: (float(p.percent), float(p.true)), reverse=True)
+    return render_template("predictions.html", predictions=predictions, tr=tr, l=l, perc=perc)
 
 
 @app.route('/all_predictions')
 @app.route('/all_predictions/<page>')
 def all_predictions(page=0):
     page = int(page)
-    db = Database()
-    db.db.execute("""
-            SELECT predictions.prediction,actual,current,time,updated_at,predictions.id,companies.name, companies.id as c_id FROM predictions INNER JOIN companies ON predictions.company_id = companies.id ORDER BY predictions.id DESC LIMIT %s OFFSET %s  
-        """, (50, 50 * int(page)))
-    predictions = db.db.fetchall()
-    if predictions is None:
-        return render_template("all_predictions.html", predictions=predictions)
-    for i in range(len(predictions)):
-        predictions[i]["trend"] = float(predictions[i]["prediction"]) > float(predictions[i]["current"])
+    predictions = Prediction.select(Prediction, Company).join(Company).order_by(Prediction.id.desc()).limit(
+        50).offset(
+        50 * page)
+    for p in predictions:
+        p.trend = float(p.prediction) > float(p.current)
     return render_template("all_predictions.html", predictions=predictions, page=page)
 
 
 @app.route('/predict')
-def predict():
+def predict_now():
     predict()
     return redirect('/predictions')
 
 
 @app.route('/prediction/<id>')
-def prediction(id):
-    db = Database()
-    db.db.execute("""
-            SELECT predictions.*,companies.name,companies.ticker FROM predictions INNER JOIN companies ON predictions.company_id = companies.id WHERE predictions.id=%s ORDER BY predictions.id DESC LIMIT 1  
-        """, (id,))
-    p = db.db.fetchone()
+def prediction(id=1):
+    p = Prediction.select(Prediction, Company).join(Company).where(Prediction.id == id).limit(1)
+    p = p[0] if len(p) > 0 else None
     if p is None:
         return render_template("prediction.html", prediction=p)
-    p["trend"] = float(p["prediction"]) > float(p["current"])
-    with open('./../data/companies.pickle', 'rb') as f:
-        companies = pickle.load(f)
-    l = list(filter(lambda c: c["ticker"] == p["ticker"], companies))
-    if len(l) > 0:
-        c = l[0]
-        coefs = c["coef"]
-        pvalues = c['pvalues']
-    else:
-        coefs = None
-        pvalues = None
+    p.trend = float(p.prediction) > float(p.current)
+    p.company.linear_model = json.loads(p.company.linear_model)
+    return render_template("prediction.html", p=p)
 
-    return render_template("prediction.html", prediction=p, coefs=coefs, pvalues=pvalues)
+
+@app.route("/graphs/<path:path>")
+def send_graph(path):
+    return send_from_directory('./../data/plots/', path)
 
 
 @app.route('/update_actual')
 def update_actual():
-    update_actual()
+    update_predictions()
     return redirect('/predictions')
 
 

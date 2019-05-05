@@ -12,15 +12,10 @@
     </p>
     <h1>Last predictions: </h1>
     <h4>Linreg: {{ tr }}/{{ l }} ({{ perc }}%)</h4>
-    <h4>MA percent: {{ "%.2f"|format(mean_ma_percent) }}%</h4>
     <div style="display: flex; flex-direction: row;">
         <div style="width: 50%; max-height: 100%;text-align: center">
             <h3>Linreg:</h3>
             <canvas id="myChart"></canvas>
-        </div>
-        <div style="width: 50%;max-height: 100%;text-align: center">
-            <h3>MA:</h3>
-            <canvas id="myChart2"></canvas>
         </div>
     </div>
     <br>
@@ -39,22 +34,22 @@
         <tbody>
         {% for prediction in predictions %}
             <tr>
-                <td>{{ prediction["name"] }}</td>
-                <td>{{ prediction["true"] }}/{{ prediction["count"] }}
-                    {{ prediction["percent"] }}%
+                <td>{{ prediction.company.name }}</td>
+                <td>{{ prediction.true }}/{{ prediction.count }}
+                    {{ prediction.percent }}%
                 </td>
-                <td>{{ "%.2f"|format(prediction["ma_percent"]) }}%</td>
+                <td>{{ "%.2f"|format(prediction.ma_percent) }}%</td>
 
-                <td>{{ "%.5f"|format(prediction["current"]) }}</td>
+                <td>{{ "%.5f"|format(prediction.current) }}</td>
                 <td>
-                    {% if prediction["trend"] %}
-                        <span style="color: forestgreen;">{{ "%.5f"|format(prediction["prediction"]) }} ↑</span>
+                    {% if prediction.trend %}
+                        <span style="color: forestgreen;">{{ "%.5f"|format(prediction.prediction) }} ↑</span>
                     {% else %}
-                        <span style="color:lightcoral">{{ "%.5f"|format(prediction["prediction"]) }} ↓</span>
+                        <span style="color:lightcoral">{{ "%.5f"|format(prediction.prediction) }} ↓</span>
                     {% endif %}
                 </td>
-                <td>{{ prediction["time"] }}</td>
-                <td>{{ prediction["updated_at"] }}</td>
+                <td>{{ prediction.time }}</td>
+                <td>{{ prediction.updated_at }}</td>
             </tr>
         {% endfor %}
         </tbody>
@@ -79,26 +74,6 @@
             data: data,
             options: {
                 rotation: 0.5 * Math.PI,
-            }
-        })
-    </script>
-    <script>
-        let ctx2 = document.getElementById('myChart2').getContext('2d');
-        let data2 = {
-            datasets: [{
-                data: [{{ "%.2f"|format(mean_ma_percent) }},{{ "%.2f"|format(100-mean_ma_percent) }}],
-                backgroundColor: ["rgba(19, 136, 8, 0.8)", "rgba(248, 0, 0,0.8)"]
-            }],
-            labels: [
-                'True',
-                'False',
-            ]
-        };
-        let myPieChart2 = new Chart(ctx2, {
-            type: 'doughnut',
-            data: data2,
-            options: {
-                rotation: 0.5 * Math.PI
             }
         })
     </script>

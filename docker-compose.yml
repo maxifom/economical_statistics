@@ -2,8 +2,6 @@ version: '3'
 networks:
   backend:
     driver: bridge
-  proxy:
-    external: true
 volumes:
   mysql:
     driver: local
@@ -12,7 +10,6 @@ services:
     image: mysql:5.7.25
     restart: always
     networks:
-      - proxy
       - backend
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -23,16 +20,20 @@ services:
       - ./docker/mysql/conf.d:/etc/mysql/conf.d
       - mysql:/var/lib/mysql
       - ./docker/mysql/start_scripts:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
   app:
     build: .
     volumes:
       - ./python:/usr/src/app/python
+      - ./data:/usr/src/app/data
     tty: true
     environment:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_HOST=mysql_economics
+      - DELETE_CODE=${DELETE_CODE}
     depends_on:
       - mysql_economics
     networks:

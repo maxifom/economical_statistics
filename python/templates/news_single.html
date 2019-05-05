@@ -1,0 +1,47 @@
+{% extends "template.html" %}
+{% block title %}
+    News # {{ news.id }}
+{% endblock %}
+{% block body %}
+    <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
+        <h2>News # {{ news.id }} </h2>
+        <h3><a href="/company/{{ news.company.id }}">{{ news.company.name }}</a></h3>
+        {% if news.time %}
+            <h5>News time: {{ news.time }} UTC</h5>
+            <p><a href="{{ news.link }}">Link</a> {{ "%.2f"|format(news.sent_score) }} {{ news.word_count }} words</p>
+            <p>{{ news.body }}</p>
+        {% endif %}
+    </div>
+    {% if news.parsed_sentence %}
+        <p>
+            Parsed view: {{ news.parsed_sentence }}
+        </p>
+    {% endif %}
+    {% if news.words %}
+        <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
+            <h3>Words:</h3>
+            <table class="table table-bordered table-striped table-responsive">
+                <thead>
+                <tr>
+                    <td>Word</td>
+                    <td>Score</td>
+                    <td>Count</td>
+                </tr>
+                </thead>
+                <tbody>
+                {% for word in news.words %}
+                    {% if word["score"]|float !=0 %}
+                        <tr>
+                            <td>{{ word["word"] }}</td>
+                            <td>{{ word["score"] }}</td>
+                            <td>{{ word["count"] }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+{% endblock %}
