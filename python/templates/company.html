@@ -27,8 +27,7 @@
     {% endif %}
 
     <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
-        <p title="{{ company.linear_model.fvalue }}({{ company.linear_model.f_pvalue }})">F-statistics (Prob.
-            F-statistics): {{ "%.3f"|format( company.linear_model.fvalue) }}
+        <p title="{{ company.linear_model.fvalue }}({{ company.linear_model.f_pvalue }})">F-statistics (F-statistics P-Value): {{ "%.3f"|format( company.linear_model.fvalue) }}
             ({{ "%.3f"|format(company.linear_model.f_pvalue) }})</p>
         <p title="{{ company.linear_model.aic }}">AIC: {{ "%.3f"|format(company.linear_model.aic) }}</p>
         <p title="{{ company.linear_model.bic }}">BIC: {{ "%.3f"|format(company.linear_model.bic) }}</p>
