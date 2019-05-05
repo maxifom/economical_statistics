@@ -6,7 +6,7 @@ from datetime import datetime
 import requests
 from scrapy import Selector
 from misc.format import Formatter
-from models import Price
+from models import Price, Company
 
 
 def parse_prices():
@@ -19,6 +19,8 @@ def parse_prices():
     sel = Selector(text=r.text)
     companies_info = sel.css('table#cr1 > tbody').xpath('./tr[contains(@id,"pair")]')
     for company in companies_info:
+        name_el = company.xpath('./td[2]/a')
+        name = name_el.xpath('./text()').extract_first()
         current_price = company.xpath('./td[contains(@class,"last")]/text()').extract_first()
         current_price = Formatter.format_price(current_price)
         high_price = company.xpath('./td[contains(@class,"high")]/text()').extract_first()
@@ -34,9 +36,14 @@ def parse_prices():
         p.low = low_price
         p.volume = volume
         p.time = datetime.fromtimestamp(update_time)
-        p.save()
+        company = Company.select().where(Company.name == name).limit(1)
+        if len(company) > 0:
+            p.company = company[0].id
+            p.save()
+        else:
+            continue
 
 
 if __name__ == '__main__':
     parse_prices()
-    print("Parsing successful")
+    print("Price Parsing successful")

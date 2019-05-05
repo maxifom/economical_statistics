@@ -24,7 +24,6 @@
         <tr>
             <td>Name</td>
             <td>Percent</td>
-            <td>MA Percent</td>
             <td>Pred.time price</td>
             <td>Prediction</td>
             <td>Created</td>
@@ -38,7 +37,6 @@
                 <td>{{ prediction.true }}/{{ prediction.count }}
                     {{ prediction.percent }}%
                 </td>
-                <td>{{ "%.2f"|format(prediction.ma_percent) }}%</td>
 
                 <td>{{ "%.5f"|format(prediction.current) }}</td>
                 <td>
