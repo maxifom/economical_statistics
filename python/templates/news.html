@@ -17,7 +17,7 @@
     <h1>News:</h1>
     {% for n in news %}
         <div style="margin-bottom: 20px; border-bottom: 1px solid lightblue">
-            <a href='/news/{{ n.id }}'><h2>News # {{ n.id }} </h2></a>
+            <a href='/news_single/{{ n.id }}'><h2>News # {{ n.id }} </h2></a>
             <a href="/company/{{ n.company.id }}"><h5>{{ n.company.name }}</h5></a>
             {% if n.time %}
                 <h5>News time: {{ n.time }} UTC</h5>

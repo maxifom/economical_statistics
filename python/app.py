@@ -40,7 +40,7 @@ def news(page=0):
     return render_template('news.html', news=ns, page=page)
 
 
-@app.route("/news/<id>")
+@app.route("/news_single/<id>")
 def news_single(id=1):
     news = News.get(News.id == id)
     news.words = json.loads(news.words)
