@@ -15,6 +15,11 @@ def hello():
     return render_template('index.html')
 
 
+@app.route("/icons/<icon>")
+def icons(icon):
+    return send_from_directory('./icons/', icon)
+
+
 @app.route("/companies")
 def companies():
     companies = Company.select()
