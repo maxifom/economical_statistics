@@ -192,10 +192,10 @@ def all_predictions(page=0):
     return render_template("all_predictions.html", predictions=predictions, page=page)
 
 
-@app.route('/predict')
-def predict_now():
-    predict()
-    return redirect('/predictions')
+# @app.route('/predict')
+# def predict_now():
+#     predict()
+#     return redirect('/predictions')
 
 
 @app.route('/prediction/<id>')
