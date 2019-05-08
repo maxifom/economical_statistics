@@ -121,8 +121,8 @@
         <div class="pcloud"></div>
         <div class="ncloud"></div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.min.js"></script>
+    <script src="/js/d3.js"></script>
+    <script src="/js/d3.cloud.js"></script>
     <script>
         var neg_words = JSON.parse('{{ neg_words | tojson }}');
         var nwords = Object.keys(neg_words)
@@ -189,19 +189,7 @@
             bDeltaY = cHeight / 2 - bounds[0].y + bHeight / 2;
             bScale = bounds ? Math.min(cWidth / bWidth, cHeight / bHeight) : 1;
 
-            console.log(
-                "bounds (" + bounds[0].x +
-                ", " + bounds[0].y +
-                ", " + bounds[1].x +
-                ", " + bounds[1].y +
-                "), width " + bWidth +
-                ", height " + bHeight +
-                ", mid (" + bMidX +
-                ", " + bMidY +
-                "), delta (" + bDeltaX +
-                ", " + bDeltaY +
-                "), scale " + bScale
-            );
+
 
             // the library's bounds seem not to correspond to reality?
             // try using .getBBox() instead?
@@ -236,13 +224,7 @@
             // then do the transformation
             bbox = wCloud.node(0).getBBox();
             //ctm = wCloud.node().getCTM();
-            console.log(
-                "bbox (x: " + bbox.x +
-                ", y: " + bbox.y +
-                ", w: " + bbox.width +
-                ", h: " + bbox.height +
-                ")"
-            );
+
 
         };
     </script>
@@ -312,19 +294,7 @@
             bDeltaY = cHeight / 2 - bounds[0].y + bHeight / 2;
             bScale = bounds ? Math.min(cWidth / bWidth, cHeight / bHeight) : 1;
 
-            console.log(
-                "bounds (" + bounds[0].x +
-                ", " + bounds[0].y +
-                ", " + bounds[1].x +
-                ", " + bounds[1].y +
-                "), width " + bWidth +
-                ", height " + bHeight +
-                ", mid (" + bMidX +
-                ", " + bMidY +
-                "), delta (" + bDeltaX +
-                ", " + bDeltaY +
-                "), scale " + bScale
-            );
+
 
             // the library's bounds seem not to correspond to reality?
             // try using .getBBox() instead?
@@ -359,13 +329,7 @@
             // then do the transformation
             bbox = wCloud.node(0).getBBox();
             //ctm = wCloud.node().getCTM();
-            console.log(
-                "bbox (x: " + bbox.x +
-                ", y: " + bbox.y +
-                ", w: " + bbox.width +
-                ", h: " + bbox.height +
-                ")"
-            );
+
 
         };
     </script>
@@ -439,19 +403,6 @@
             bDeltaY = cHeight / 2 - bounds[0].y + bHeight / 2;
             bScale = bounds ? Math.min(cWidth / bWidth, cHeight / bHeight) : 1;
 
-            console.log(
-                "bounds (" + bounds[0].x +
-                ", " + bounds[0].y +
-                ", " + bounds[1].x +
-                ", " + bounds[1].y +
-                "), width " + bWidth +
-                ", height " + bHeight +
-                ", mid (" + bMidX +
-                ", " + bMidY +
-                "), delta (" + bDeltaX +
-                ", " + bDeltaY +
-                "), scale " + bScale
-            );
 
             // the library's bounds seem not to correspond to reality?
             // try using .getBBox() instead?
@@ -488,13 +439,7 @@
             // then do the transformation
             bbox = wCloud.node(0).getBBox();
             //ctm = wCloud.node().getCTM();
-            console.log(
-                "bbox (x: " + bbox.x +
-                ", y: " + bbox.y +
-                ", w: " + bbox.width +
-                ", h: " + bbox.height +
-                ")"
-            );
+
 
         };
 

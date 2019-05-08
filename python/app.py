@@ -1,10 +1,9 @@
 import json
 
 import pandas as pd
-from flask import Flask, render_template, request, redirect, make_response, send_from_directory
+from flask import Flask, render_template, request, redirect, make_response, send_from_directory, send_file
 from misc.add_to_dictionary import add_words_from_txt, process_lines, process_line
 from models.models import *
-from realtime_parsing.predict import predict
 from realtime_parsing.update_actual import update_predictions
 
 app = Flask(__name__)
@@ -13,6 +12,11 @@ app = Flask(__name__)
 @app.route("/<path:path>")
 def asset(path):
     return send_from_directory("assets", path)
+
+
+@app.route("/sw.js")
+def service_worker():
+    return send_file("./assets/sw.js", mimetype="application/javascript")
 
 
 @app.route("/")

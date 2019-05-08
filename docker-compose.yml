@@ -1,7 +1,5 @@
-version: '3'
+version: '3.7'
 networks:
-  backend:
-    driver: bridge
   proxy:
     external: true
 volumes:
@@ -12,33 +10,64 @@ services:
     image: mysql:5.7.25
     restart: always
     networks:
-      - backend
-      - proxy
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      proxy:
+        aliases:
+          - ${MYSQL_HOST}
+    env_file:
+      - .env
     volumes:
-      - ./docker/mysql/conf.d:/etc/mysql/conf.d
       - mysql:/var/lib/mysql
-      - ./docker/mysql/start_scripts:/docker-entrypoint-initdb.d
+    configs:
+      - source: mysql_config
+        target: /etc/mysql/conf.d/low-mem.cnf
+        mode: 644
+        gid: "1000"
+        uid: "1000"
+      - source: mysql_schema
+        target: /docker-entrypoint-initdb.d/schema.sql
+        mode: 644
+        gid: "1000"
+        uid: "1000"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
+      mode: replicated
+      placement:
+        constraints:
+          - node.role == manager
+          - node.labels.server == 2
   app:
     build: .
+    image: economics:latest
     volumes:
       - ./python:/usr/src/app/python
       - ./data:/usr/src/app/data
     tty: true
-    environment:
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_HOST=mysql_economics
-      - DELETE_CODE=${DELETE_CODE}
-      - PYTHONPATH=${PYTHONPATH}
+    env_file:
+      - .env
     depends_on:
       - mysql_economics
     networks:
-      - backend
-    ports:
-      - 80:5000
+      - proxy
+    deploy:
+      labels:
+        traefik.enable: "true"
+        traefik.docker.network: "proxy"
+        traefik.port: "5000"
+        traefik.frontend.passHostHeader: "true"
+        traefik.frontend.rule: "Host:economics.maxifom.com"
+        traefik.frontend.whiteList.useXForwardedFor: "true"
+      replicas: 1
+      restart_policy:
+        condition: any
+      mode: replicated
+      placement:
+        constraints:
+          - node.role == manager
+          - node.labels.server == 2
+configs:
+  mysql_config:
+    file: ./docker/mysql/conf.d/low-mem.cnf
+  mysql_schema:
+    file: ./docker/mysql/start_scripts/mysql-schema.sql
