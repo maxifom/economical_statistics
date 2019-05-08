@@ -10,7 +10,7 @@ from realtime_parsing.update_actual import update_predictions
 app = Flask(__name__)
 
 
-@app.route("/assets/<path:path>")
+@app.route("/<path:path>")
 def asset(path):
     return send_from_directory("assets", path)
 

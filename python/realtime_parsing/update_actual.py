@@ -19,7 +19,7 @@ def update_predictions():
             weekday = (p.time.weekday() + 1) % 7
             price = Price.select(Price.current).where(
                 (Price.time > p.time) & (
-                        fn.WEEKDAY(Price.time) == weekday) & Price.company == p.company).order_by(
+                        fn.WEEKDAY(Price.time) == weekday) & (Price.company == p.company)).order_by(
                 Price.id.desc()).limit(1)
         price = price[0].current if len(price) > 0 else None
         if price is not None:

@@ -26,8 +26,8 @@
             <td>Percent</td>
             <td>Pred.time price</td>
             <td>Prediction</td>
-            <td>Created</td>
-            <td>Updated*</td>
+            {#<td>Created</td>
+            <td>Updated*</td>#}
         </tr>
         </thead>
         <tbody>
@@ -46,13 +46,13 @@
                         <span style="color:lightcoral">{{ "%.5f"|format(prediction.prediction) }} ↓</span>
                     {% endif %}
                 </td>
-                <td>{{ prediction.time }}</td>
-                <td>{{ prediction.updated_at }}</td>
+                {#<td>{{ prediction.time }}</td>
+                <td>{{ prediction.updated_at }}</td>#}
             </tr>
         {% endfor %}
         </tbody>
     </table>
-    <p>* - prediction price not updated since created</p>
+{#    <p>* - prediction price not updated since created</p>#}
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
     <script>
