@@ -34,6 +34,10 @@
         h1, h2, thead {
             font-weight: 700;
         }
+        a:hover, .current {
+            background: deepskyblue;
+            color: white!important;
+        }
     </style>
     {% block head %}
 
@@ -43,29 +47,31 @@
 
 <ul class="nav justify-content-center" style="border-bottom: 1px solid lightblue">
     <li class="nav-item">
-        <div style="display: inline-block;margin-top: 5px; "><img style="max-width: 32px;max-height:32px"
-                                                                  src="/ds.png" alt="Data Science"><span
-                class="nav-link" style="display: inline; vertical-align: center; ">Economical Statistics</span>
+        <div style="display: inline-block;margin-top: 5px; "><img style="max-width: 32px;max-height:32px" src="/ds.png"
+                                                                  alt="Data Science">
+            <a class="nav-link" href="/"
+               style="display: inline; vertical-align: center;">Economical
+                Statistics</a>
         </div>
     </li>
     <li class="nav-item">
-        <a class="nav-link active" href="/companies">Companies</a>
+        <a class="nav-link" href="/companies">Companies</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link active" href="/news">News</a>
+        <a class="nav-link" href="/news">News</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link active" href="/history">History</a>
+        <a class="nav-link" href="/history">History</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link active" href="/visualization">Visualization</a>
+        <a class="nav-link" href="/visualization">Visualization</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link active" href="/predictions">Predictions</a>
+        <a class="nav-link" href="/predictions">Predictions</a>
     </li>
 
     <li class="nav-item">
-        <a class="nav-link active text-danger" href="/dict">Dict</a>
+        <a class="nav-link" href="/dict">Dict</a>
     </li>
 </ul>
 
@@ -82,6 +88,18 @@
             navigator.serviceWorker.register('/sw.js');
         });
     }
+</script>
+<script>
+    $(document).ready(function () {
+        let path = window.location.pathname.split("/")[1];
+        if (path === "company") {
+            path = "companies"
+        } else if (path === "news_single") {
+            path = "news"
+        }
+        const element = $("a[href='/" + path + "']")[0];
+        $(element).addClass("current");
+    });
 </script>
 </body>
 </html>
