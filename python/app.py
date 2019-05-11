@@ -5,7 +5,10 @@ from flask import Flask, render_template, request, redirect, make_response, send
 from misc.add_to_dictionary import add_words_from_txt, process_lines, process_line
 from models.models import *
 from realtime_parsing.update_actual import update_predictions
+from flask_compress import Compress
 
+COMPRESS_LEVEL = 6
+COMPRESS_MIN_SIZE = 500
 app = Flask(__name__)
 
 
@@ -20,15 +23,6 @@ def service_worker():
 
 
 @app.route("/")
-def hello():
-    return render_template('index.html')
-
-
-@app.route("/icons/<icon>")
-def icons(icon):
-    return send_from_directory('./icons/', icon)
-
-
 @app.route("/companies")
 def companies():
     companies = Company.select()
@@ -225,4 +219,5 @@ def update_actual():
 
 
 if __name__ == '__main__':
+    Compress(app)
     app.run(host='0.0.0.0', port=5000, debug=True)
