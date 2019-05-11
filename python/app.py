@@ -218,6 +218,11 @@ def update_actual():
     return redirect('/predictions')
 
 
+@app.route('/methodology')
+def methodology():
+    return render_template('methodology.html')
+
+
 if __name__ == '__main__':
     Compress(app)
     app.run(host='0.0.0.0', port=5000, debug=True)

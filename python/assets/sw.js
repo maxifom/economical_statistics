@@ -26,7 +26,7 @@ workbox.routing.registerRoute(
     })
 );
 workbox.routing.registerRoute(
-    new RegExp("/(companies|company|news_single|news|history|visualization|predictions|dict|all_predictions)[\/*[0-9]*]*"),
+    new RegExp("/(companies|company|methodology|news_single|news|history|visualization|predictions|dict|all_predictions)[\/*[0-9]*]*"),
     new workbox.strategies.StaleWhileRevalidate({
         cacheName: "html-cache",
         plugins: [

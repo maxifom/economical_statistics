@@ -1,0 +1,26 @@
+{% extends "template.html" %}
+{% block title %}
+    Methodology
+{% endblock %}
+{% block body %}
+    <div>
+        <h1>Methodology</h1>
+        <p>For both Linear Regression and <a href="https://wikipedia.org/wiki/ARIMA">ARIMA</a> models we used next parameters to forecast next day closing price:</p>
+        <ul>
+            <li>Sentiment score of news</li>
+            <li>Log Return (ln(Closing Price) - ln(Prev day Closing Price))</li>
+            <li>Trading Volume</li>
+            <li>Overnight Variation (Day opening - Last day closing price)</li>
+            <li>Trading Day Variation (Day high - low price)</li>
+            <li>Closing Price of previous day</li>
+        </ul>
+        For linear regression model we used this formula to calculate next day closing price:
+        <div><img style="display: inline-block;max-width: 90%; margin: 0 5%;" src="/linreg.png" alt="Img"></div>
+        For comparison we used <a href="https://wikipedia.org/wiki/ARIMA">ARIMA</a>(0,1,4) model with closing price as a
+        parameter. <br>
+        Both models were trained on 80% of data and then tested on 20% of data to calculate accuracy and value loss (RMSE) of
+        each
+        one. (Price and news dataset from 2016-01-01) <br>
+        Results of it we can see in the <a href="/visualization">table</a>
+    </div>
+{% endblock %}
