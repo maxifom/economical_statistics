@@ -13,10 +13,7 @@
     <h1>Last predictions: </h1>
     <h4>Linreg: {{ tr }}/{{ l }} ({{ perc }}%)</h4>
     <div style="display: flex; flex-direction: row;">
-        <div style="width: 50%; max-height: 100%;text-align: center">
-            <h3>Linreg:</h3>
-            <canvas id="myChart"></canvas>
-        </div>
+        <div id="myChart"></div>
     </div>
     <br>
     <table class="table table-responsive table-sm table-striped">
@@ -52,27 +49,25 @@
         {% endfor %}
         </tbody>
     </table>
-{#    <p>* - prediction price not updated since created</p>#}
+    {#    <p>* - prediction price not updated since created</p>#}
 
-    <script src="/js/chart.js"></script>
+    <script src="/js/pie-chart.js"></script>
     <script>
-        let ctx = document.getElementById('myChart').getContext('2d');
-        let data = {
-            datasets: [{
-                data: [{{ tr }}, {{ l - tr }}],
-                backgroundColor: ["rgba(19, 136, 8, 0.8)", "rgba(248, 0, 0,0.8)"]
-            }],
-            labels: [
-                'True',
-                'False',
-            ]
-        };
-        let myPieChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: data,
-            options: {
-                rotation: 0.5 * Math.PI,
+        var data = [{
+            values: [{{ tr }}, {{ l-tr }}],
+            labels: ['True', 'False'],
+            type: 'pie',
+            name: "Linreg predictions",
+            marker: {
+                colors: ["rgba(19, 136, 8, 0.8)", "rgba(248, 0, 0,0.8)"]
             }
-        })
+        }];
+
+        var layout = {
+            height: 300,
+            width: 300
+        };
+
+        Plotly.newPlot('myChart', data, layout, {responsive: true});
     </script>
 {% endblock %}

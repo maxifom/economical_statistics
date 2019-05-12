@@ -8,3 +8,4 @@ How to build:
 5. Calculate sentiment scores (calculate_sentiment_scores_on_news.py)
 6. Group prices with sentiment scores (group_prices_and_sentiment_scores.py)
 7. Calculate linreg model (calculate_linreg_params.py)
+8. Calculate ARIMA model (calculate_arima_model.py)

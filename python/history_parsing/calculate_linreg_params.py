@@ -12,6 +12,9 @@ import pandas as pd
 from models import Company
 
 import numpy as np
+import warnings
+
+warnings.filterwarnings('ignore')
 
 
 def predict(x, params):
@@ -85,7 +88,7 @@ def calculate_linreg_coef_and_pvalues_statsmodels():
         plt.ylabel("Price, RUB")
         plt.title(c.name)
         plt.legend()
-        plt.savefig(f"./../../data/plots/price/{c.ticker}.png", format="png")
+        plt.savefig(f"./../../data/plots/linreg/price/{c.ticker}.png", format="png")
         plt.clf()
         # Accuracy
         plt.figure(figsize=(12.8, 7.2))
@@ -99,7 +102,7 @@ def calculate_linreg_coef_and_pvalues_statsmodels():
         plt.ylabel("Accuracy, %")
         plt.title(c.name)
         plt.legend()
-        plt.savefig(f"./../../data/plots/acc/{c.ticker}.png", format="png")
+        plt.savefig(f"./../../data/plots/linreg/acc/{c.ticker}.png", format="png")
         plt.clf()
         # Value loss
         plt.figure(figsize=(12.8, 7.2))
@@ -112,7 +115,7 @@ def calculate_linreg_coef_and_pvalues_statsmodels():
         plt.ylabel("Value Loss")
         plt.title(c.name)
         plt.legend()
-        plt.savefig(f"./../../data/plots/val_loss/{c.ticker}.png", format="png")
+        plt.savefig(f"./../../data/plots/linreg/val_loss/{c.ticker}.png", format="png")
         plt.clf()
         # Value loss percentage of mean price
         plt.figure(figsize=(12.8, 7.2))
@@ -125,9 +128,12 @@ def calculate_linreg_coef_and_pvalues_statsmodels():
         plt.ylabel("Value Loss, %")
         plt.title(c.name)
         plt.legend()
-        plt.savefig(f"./../../data/plots/val_loss_pct/{c.ticker}.png", format="png")
+        plt.savefig(f"./../../data/plots/linreg/val_loss_pct/{c.ticker}.png", format="png")
         plt.clf()
         df.to_csv(f"./../../data/graph_data/linreg/{c.ticker}.csv", index=False)
+        df[["date", "acc"]][5:].to_csv(f"./../../data/graph_data/linreg/acc_{c.ticker}.csv", index=False)
+        df[["date", "val_loss"]].to_csv(f"./../../data/graph_data/linreg/val_loss_{c.ticker}.csv", index=False)
+        df[["date", "val_loss_pct"]].to_csv(f"./../../data/graph_data/linreg/val_loss_pct_{c.ticker}.csv", index=False)
 
 
 if __name__ == '__main__':

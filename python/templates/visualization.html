@@ -2,8 +2,99 @@
 {% block title %}
     Dictionary and word cloud
 {% endblock %}
+{% block scripts %}
 
+    <script src="/js/plotly-finance.js"></script>
+    <script>
+        function drawGraph(csv, name, width, height, labels, vline) {
+            labels = labels.split(",");
+            console.log(labels);
+            Plotly.d3.csv(csv, function (err, rows) {
+                var max = 0.0;
+                var min = 1e9;
+
+                function unpack(rows, key) {
+                    return rows.map(function (row) {
+                        max = Math.max(max, row[labels[0]]);
+                        min = Math.min(min, row[labels[0]]);
+                        return row[key];
+                    });
+                }
+
+                const colors = [
+                    "#2e16b1",
+                    "#34d800",
+                    "#F30021"
+                ];
+                let data = [];
+                for (let i in labels) {
+                    let l = labels[i];
+                    let trace = {
+                        type: "scatter",
+                        mode: "lines",
+                        name: l,
+                        x: unpack(rows, 'date'),
+                        y: unpack(rows, l),
+                        line: {color: colors[i]}
+                    };
+                    data.push(trace);
+                }
+                let shapes = [];
+                if (vline === true) {
+                    const x = Math.round(rows.length * 0.8);
+                    shapes.push({
+                        type: 'line',
+                        x0: rows[x]["date"],
+                        x1: rows[x]["date"],
+                        y0: min,
+                        y1: max,
+                        line: {
+                            color: "black",
+                            width: 1
+                        }
+                    });
+                }
+                let layout = {
+                    autosize: false,
+                    width: width,
+                    height: height,
+                    title: name,
+                    shapes: shapes,
+                };
+                Plotly.newPlot('graph', data, layout);
+            })
+        }
+
+        $(".graph-button").click(function (e) {
+            $("#graph").show();
+            let width = $("#graph").width();
+            let height = $("#graph").height();
+            let name = e.target.getAttribute("name");
+            let labels = e.target.getAttribute("labels");
+            let vline = e.target.getAttribute("vline");
+            if (vline === "true") {
+                vline = true
+            } else {
+                vline = false;
+            }
+            drawGraph(e.target.getAttribute("href"), name, width, height, labels, vline)
+        });
+
+        function closeGraph() {
+            $("#graph").hide();
+        }
+    </script>
+{% endblock %}
 {% block body %}
+    <style>
+        button {
+            border: 0;
+        }
+    </style>
+    <div style="width: 80%; height: 80%;position: fixed; top: 10%; left: 10%; display: none"
+         id="graph">
+        <button onclick="closeGraph()" style="position: absolute; right: 10px; top:0">Close</button>
+    </div>
     <div>
         <h3>Linreg Model trained on data from Jan 1 2016 to Apr 3 2019:</h3>
         <table class="table table-responsive table-striped table-sm">
@@ -31,12 +122,49 @@
                     <td title="{{ c.linear_model.train_val_loss }}({{ c.linear_model.train_val_loss_percent }})">{{ "%.4f"|format(c.linear_model.train_val_loss) }}({{ "%.2f"|format(c.linear_model.train_val_loss_percent*100) }}%)</td>
                     <td title="{{ c.linear_model.test_val_loss }}({{ c.linear_model.test_val_loss_percent }})">{{ "%.4f"|format(c.linear_model.test_val_loss) }}({{ "%.2f"|format(c.linear_model.test_val_loss_percent*100) }}%)
                     </td>
-                    <td><a href="/graphs/linreg/price/{{ c.ticker }}.png">Graph</a></td>
-                    <td><a href="/graphs/linreg/acc/{{ c.ticker }}.png">Graph</a></td>
-                    <td><a href="/graphs/linreg/val_loss/{{ c.ticker }}.png">Graph</a> <a
-                            href="/graphs/linreg/val_loss_pct/{{ c.ticker }}.png">(%)</a></td>
+                    <td>
+                        <button name="{{ c.name }} Price" vline="true" labels="next_close,prediction"
+                                class="graph-button"
+                                href="/csv/linreg/price_{{ c.ticker }}.csv">Graph
+                        </button>
+                    </td>
+                    <td>
+                        <button name="{{ c.name }} Accuracy" vline="true" labels="acc" class="graph-button"
+                                href="/csv/linreg/acc_{{ c.ticker }}.csv">Graph
+                        </button>
+                    </td>
+                    <td>
+                        <button name="{{ c.name }} Value Loss" vline="true" labels="val_loss" class="graph-button"
+                                href="/csv/linreg/val_loss_{{ c.ticker }}.csv">Graph
+                        </button>
+                        <button name="{{ c.name }} Value Loss %" vline="true" labels="val_loss_pct" class="graph-button"
+                                href="/csv/linreg/val_loss_pct_{{ c.ticker }}.csv">(%)
+                        </button>
+                    </td>
                 </tr>
             {% endfor %}
+            <tr>
+                <td>Means</td>
+                <td title="{{ means["linreg"]["train_acc"] }}">{{ "%.2f" | format(means["linreg"]["train_acc"]*100) }}%</td>
+                <td title="{{ means["linreg"]["test_acc"] }}">{{ "%.2f" | format(means["linreg"]["test_acc"]*100) }}%</td>
+                <td title="{{ means["linreg"]["train_val_loss"] }}({{ means["linreg"]["train_val_loss_percent"] }})">{{ "%.4f"|format(means["linreg"]["train_val_loss"]) }}({{ "%.2f"|format(means["linreg"]["train_val_loss_percent"]*100) }}%)</td>
+                <td title="{{ means["linreg"]["test_val_loss"] }}({{ means["linreg"]["test_val_loss_percent"] }})">{{ "%.4f"|format(means["linreg"]["test_val_loss"]) }}({{ "%.2f"|format(means["linreg"]["test_val_loss_percent"]*100) }}%)
+                </td>
+                <td>
+                    <button disabled>Graph</button>
+                </td>
+                <td>
+                    <button name="All Accuracy" labels="{{ companies_str }}" class="graph-button"
+                            href="/csv/linreg/all_acc.csv">Graph
+                    </button>
+                </td>
+                <td>
+                    <button disabled>Graph</button>
+                    <button name="All Value Loss %" labels="{{ companies_str }}" class="graph-button"
+                            href="/csv/linreg/all_val_loss_pct.csv">(%)
+                    </button>
+                </td>
+            </tr>
 
             </tbody>
 
@@ -64,13 +192,46 @@
                     <td title="{{ c.arima_model.test_acc }}">{{ "%.2f" | format(c.arima_model.test_acc*100) }}%</td>
                     <td title="{{ c.arima_model.test_val_loss }}({{ c.arima_model.test_val_loss_percent }})">{{ "%.4f"|format(c.arima_model.test_val_loss) }}({{ "%.2f"|format(c.arima_model.test_val_loss_percent*100) }}%)
                     </td>
-                    <td><a href="/graphs/arima/price/{{ c.ticker }}.png">Graph</a></td>
-                    <td><a href="/graphs/arima/acc/{{ c.ticker }}.png">Graph</a></td>
-                    <td><a href="/graphs/arima/val_loss/{{ c.ticker }}.png">Graph</a> <a
-                            href="/graphs/arima/val_loss_pct/{{ c.ticker }}.png">(%)</a></td>
+                    <td>
+                        <button name="{{ c.name }} Price" labels="close,prediction" class="graph-button"
+                                href="/csv/arima/price_{{ c.ticker }}.csv">Graph
+                        </button>
+                    </td>
+                    <td>
+                        <button name="{{ c.name }} Accuracy" labels="acc" class="graph-button"
+                                href="/csv/arima/acc_{{ c.ticker }}.csv">Graph
+                        </button>
+                    </td>
+                    <td>
+                        <button name="{{ c.name }} Value Loss" labels="val_loss" class="graph-button"
+                                href="/csv/arima/val_loss_{{ c.ticker }}.csv">Graph
+                        </button>
+                        <button name="{{ c.name }} Value Loss %" labels="val_loss_pct" class="graph-button"
+                                href="/csv/arima/val_loss_pct_{{ c.ticker }}.csv">(%)
+                        </button>
+                    </td>
                 </tr>
             {% endfor %}
-
+            <tr>
+                <td>Means</td>
+                <td title="{{ means["arima"]["test_acc"] }}">{{ "%.2f" | format(means["arima"]["test_acc"]*100) }}%</td>
+                <td title="{{ means["arima"]["test_val_loss"] }}({{ means["arima"]["test_val_loss_percent"] }})">{{ "%.4f"|format(means["arima"]["test_val_loss"]) }}({{ "%.2f"|format(means["arima"]["test_val_loss_percent"]*100) }}%)
+                </td>
+                <td>
+                    <button disabled>Graph</button>
+                </td>
+                <td>
+                    <button name="All Accuracy" labels="{{ companies_str }}" class="graph-button"
+                            href="/csv/arima/all_acc.csv">Graph
+                    </button>
+                </td>
+                <td>
+                    <button disabled>Graph</button>
+                    <button name="All Value Loss %" labels="{{ companies_str }}" class="graph-button"
+                            href="/csv/arima/all_val_loss_pct.csv">(%)
+                    </button>
+                </td>
+            </tr>
             </tbody>
 
         </table>
@@ -100,19 +261,44 @@
                     <td title="{{ c.linear_model.test_val_loss-c.arima_model.test_val_loss }}({{ c.linear_model.test_val_loss_percent-c.arima_model.test_val_loss_percent }})">
                         {{ "%.4f"|format(c.linear_model.test_val_loss-c.arima_model.test_val_loss) }}({{ "%.2f"|format(c.linear_model.test_val_loss_percent*100-c.arima_model.test_val_loss_percent*100) }}%)
                     </td>
-                    <td><a href="/graphs/comparison/price/{{ c.ticker }}.png">Graph</a></td>
-                    <td><a href="/graphs/comparison/acc/{{ c.ticker }}.png">Graph</a></td>
-                    <td><a href="/graphs/comparison/val_loss/{{ c.ticker }}.png">Graph</a> <a
-                            href="/graphs/comparison/val_loss_pct/{{ c.ticker }}.png">(%)</a></td>
+                    <td>
+                        <button name="{{ c.name }} Price" labels="arima,linreg,actual" class="graph-button"
+                                href="/csv/comparison/price_{{ c.ticker }}.csv">Graph
+                        </button>
+                    </td>
+                    <td>
+                        <button name="{{ c.name }} Accuracy" labels="arima,linreg" class="graph-button"
+                                href="/csv/comparison/acc_{{ c.ticker }}.csv">Graph
+                        </button>
+                    </td>
+                    <td>
+                        <button name="{{ c.name }} Value Loss" labels="arima,linreg" class="graph-button"
+                                href="/csv/comparison/val_loss_{{ c.ticker }}.csv">Graph
+                        </button>
+                        <button name="{{ c.name }} Value Loss %" labels="arima,linreg" class="graph-button"
+                                href="/csv/comparison/val_loss_pct_{{ c.ticker }}.csv">(%)
+                        </button>
+                    </td>
                 </tr>
             {% endfor %}
-
+            <tr>
+                <td>Means</td>
+                <td title="{{ means["linreg"]["test_acc"] - means["arima"]["test_acc"] }}">{{ "%.2f" | format((means["linreg"]["test_acc"] - means["arima"]["test_acc"])*100) }}%</td>
+                <td title="{{ means["linreg"]["test_val_loss"]-means["arima"]["test_val_loss"] }}({{ means["linreg"]["test_val_loss_percent"]-means["arima"]["test_val_loss_percent"] }})">{{ "%.4f"|format(means["linreg"]["test_val_loss"]-means["arima"]["test_val_loss"]) }}({{ "%.2f"|format((means["linreg"]["test_val_loss_percent"]-means["arima"]["test_val_loss_percent"])*100) }}%)
+                </td>
+                <td><button disabled>Graph</button></td>
+                <td><button disabled>Graph</button></td>
+                <td><button disabled>Graph</button>
+                    <button disabled>(%)</button></td>
+            </tr>
             </tbody>
 
         </table>
     </div>
 
+    <script>
 
+    </script>
 
 
     <div>
@@ -188,7 +374,6 @@
             bDeltaX = cWidth / 2 - bounds[0].x + bWidth / 2;
             bDeltaY = cHeight / 2 - bounds[0].y + bHeight / 2;
             bScale = bounds ? Math.min(cWidth / bWidth, cHeight / bHeight) : 1;
-
 
 
             // the library's bounds seem not to correspond to reality?
@@ -293,7 +478,6 @@
             bDeltaX = cWidth / 2 - bounds[0].x + bWidth / 2;
             bDeltaY = cHeight / 2 - bounds[0].y + bHeight / 2;
             bScale = bounds ? Math.min(cWidth / bWidth, cHeight / bHeight) : 1;
-
 
 
             // the library's bounds seem not to correspond to reality?

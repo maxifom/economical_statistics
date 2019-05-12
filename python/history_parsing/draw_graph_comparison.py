@@ -76,3 +76,32 @@ if __name__ == '__main__':
         plt.savefig(f"./../../data/plots/comparison/val_loss_pct/{c.ticker}.png", format="png")
         plt.clf()
 
+        df_price = pd.DataFrame()
+        df_price["arima"] = df_arima.prediction
+        df_price["linreg"] = df_linreg.prediction
+        df_price["date"] = df_linreg.date
+        df_price["actual"] = df_arima.close
+        df_price[["date", "arima", "linreg", "actual"]].to_csv(f"./../../data/graph_data/comparison/price_{c.ticker}.csv",
+                                                     index=False)
+
+        df_acc = pd.DataFrame()
+        df_acc["arima"] = df_arima.acc[5:]
+        df_acc["linreg"] = df_linreg.acc[5:]
+        df_acc["date"] = df_linreg.date[5:]
+        df_acc[["date", "arima", "linreg"]].to_csv(f"./../../data/graph_data/comparison/acc_{c.ticker}.csv",
+                                                   index=False)
+
+        df_val_loss = pd.DataFrame()
+        df_val_loss["arima"] = df_arima.val_loss
+        df_val_loss["linreg"] = df_linreg.val_loss
+        df_val_loss["date"] = df_linreg.date
+        df_val_loss[["date", "arima", "linreg"]].to_csv(f"./../../data/graph_data/comparison/val_loss_{c.ticker}.csv",
+                                                        index=False)
+
+        df_val_loss_pct = pd.DataFrame()
+        df_val_loss_pct["arima"] = df_arima.val_loss_pct
+        df_val_loss_pct["linreg"] = df_linreg.val_loss_pct
+        df_val_loss_pct["date"] = df_linreg.date
+        df_val_loss_pct[["date", "arima", "linreg"]].to_csv(
+            f"./../../data/graph_data/comparison/val_loss_pct_{c.ticker}.csv",
+            index=False)

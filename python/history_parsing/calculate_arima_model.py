@@ -105,3 +105,7 @@ if __name__ == '__main__':
         plt.savefig(f"./../../data/plots/arima/val_loss_pct/{c.ticker}.png", format="png")
         plt.clf()
         test_data.to_csv(f"./../../data/graph_data/arima/{c.ticker}.csv", index=False)
+        test_data[["date", "acc"]][5:].to_csv(f"./../../data/graph_data/arima/acc_{c.ticker}.csv", index=False)
+        test_data[["date", "val_loss"]].to_csv(f"./../../data/graph_data/arima/val_loss_{c.ticker}.csv", index=False)
+        test_data[["date", "val_loss_pct"]].to_csv(f"./../../data/graph_data/arima/val_loss_pct_{c.ticker}.csv",
+                                                   index=False)

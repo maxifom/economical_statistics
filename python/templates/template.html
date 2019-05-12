@@ -50,9 +50,10 @@
     <li class="nav-item">
         <div style="display: inline-block;margin-top: 5px; ">
             <a class="" href="/"
-               style="display: inline; vertical-align: center;"><img style="max-width: 32px;max-height:32px" src="/ds.png"
-                                                                  alt="Data Science">
-                </a>
+               style="display: inline; vertical-align: center;"><img style="max-width: 32px;max-height:32px"
+                                                                     src="/ds.png"
+                                                                     alt="Data Science">
+            </a>
             {#<a class="nav-link" href="/"
                style="display: inline; vertical-align: center;">ES</a>#}
         </div>
@@ -97,7 +98,7 @@
 <script>
     $(document).ready(function () {
         let path = window.location.pathname.split("/")[1];
-        if (path === "company") {
+        if (path === "company" || path == "") {
             path = "companies"
         } else if (path === "news_single") {
             path = "news"
@@ -106,5 +107,8 @@
         $(element).addClass("current");
     });
 </script>
+{% block scripts %}
+
+{% endblock %}
 </body>
 </html>

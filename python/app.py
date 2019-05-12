@@ -91,15 +91,47 @@ def add_words():
 @app.route("/visualization")
 def visualization():
     companies = Company.select()
+    means = {
+        "arima": {
+            "test_acc": 0,
+            "test_val_loss": 0,
+            "test_val_loss_percent": 0
+        },
+        "linreg": {
+            "train_acc": 0,
+            "test_acc": 0,
+            "train_val_loss": 0,
+            "train_val_loss_percent": 0,
+            "test_val_loss": 0,
+            "test_val_loss_percent": 0
+        }
+    }
+    count = len(companies)
+    companies_str = ""
     for c in companies:
         c.linear_model = json.loads(c.linear_model)
         c.arima_model = json.loads(c.arima_model)
+        means["arima"]["test_acc"] += c.arima_model["test_acc"]
+        means["arima"]["test_val_loss"] += c.arima_model["test_val_loss"]
+        means["arima"]["test_val_loss_percent"] += c.arima_model["test_val_loss_percent"]
+        means["linreg"]["train_acc"] += c.linear_model["train_acc"]
+        means["linreg"]["train_val_loss"] += c.linear_model["train_val_loss"]
+        means["linreg"]["train_val_loss_percent"] += c.linear_model["train_val_loss_percent"]
+        means["linreg"]["test_acc"] += c.linear_model["test_acc"]
+        means["linreg"]["test_val_loss"] += c.linear_model["test_val_loss"]
+        means["linreg"]["test_val_loss_percent"] += c.linear_model["test_val_loss_percent"]
+        companies_str += c.ticker + ","
+    companies_str = companies_str.rstrip(",")
+    f = lambda x: x / count
+    means["linreg"] = {k: f(v) for k, v in means["linreg"].items()}
+    means["arima"] = {k: f(v) for k, v in means["arima"].items()}
     with open("./../data/word_cloud/word_cloud.json", "r") as file:
         word_cloud = json.load(file)
     return render_template('visualization.html',
                            companies=companies,
                            all_words=word_cloud["all_words"],
-                           pos_words=word_cloud["positive_words"], neg_words=word_cloud["negative_words"])
+                           pos_words=word_cloud["positive_words"], neg_words=word_cloud["negative_words"], means=means,
+                           companies_str=companies_str)
 
 
 @app.route("/dict", methods=["GET"])
@@ -210,6 +242,11 @@ def prediction(id=1):
 @app.route("/graphs/<path:path>")
 def send_graph(path):
     return send_from_directory('./../data/plots/', path)
+
+
+@app.route("/csv/<path:path>")
+def send_csv(path):
+    return send_from_directory('./../data/graph_data/', path)
 
 
 @app.route('/update_actual')

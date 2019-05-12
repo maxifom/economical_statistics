@@ -22,15 +22,16 @@ def update_predictions():
         else:
             for i in [1, 2, 3, 4, 5, 6]:
                 weekday = (p.time.weekday() + i) % 7
-                price = Price.select(Price.current).where(
+                price = Price.select(Price.current, Price.time).where(
                     (Price.time > p.time) & (
                             fn.WEEKDAY(Price.time) == weekday) & (Price.company == p.company)).order_by(
                     Price.id.desc()).limit(1)
                 if len(price) > 0 or p.time + timedelta(days=i) > datetime.now():
                     break
-        price = price[0].current if len(price) > 0 else None
+        price = price[0] if len(price) > 0 else None
         if price is not None:
-            p.actual = price
+            p.actual = price.current
+            p.actual_price_time = price.time
             p.save()
 
 
