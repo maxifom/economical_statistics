@@ -6,6 +6,17 @@
 
     <script src="/js/plotly-finance.js"></script>
     <script>
+        $(".spoiler").click(function (e) {
+            let target = e.target.getAttribute("data-target");
+            $("#" + target).toggle();
+            if (e.target.innerHTML === "Open") {
+                e.target.innerHTML = "Close";
+            } else {
+                e.target.innerHTML = "Open"
+            }
+        });
+
+
         function drawGraph(csv, name, width, height, labels, vline, visible) {
             labels = labels.split(",");
             Plotly.d3.csv(csv, function (err, rows) {
@@ -106,6 +117,10 @@
     <style>
         button {
             border: 0;
+        }
+
+        body {
+            padding-bottom: 80px;
         }
     </style>
     <div style="width: 80%; height: 80%;position: fixed; top: 10%; left: 10%; display: none"
@@ -328,9 +343,19 @@
 
     <div>
         <h1>Word Cloud:</h1>
-        <div class="cloud"></div>
-        <div class="pcloud"></div>
-        <div class="ncloud"></div>
+        <span>All words:</span>
+        <button data-target="cloud" class="spoiler">Open</button>
+        <div class="cloud" id="cloud" style="display: none;"></div>
+        <br>
+        <br>
+        <span>Positive words:</span>
+        <button data-target="pcloud" class="spoiler">Open</button>
+        <div id="pcloud" class="pcloud" style="display: none;"></div>
+        <br>
+        <br>
+        <span>Negative words:</span>
+        <button data-target="ncloud" class="spoiler">Open</button>
+        <div id="ncloud" class="ncloud" style="display: none;"></div>
     </div>
     <script src="/js/d3.js"></script>
     <script src="/js/d3.cloud.js"></script>
