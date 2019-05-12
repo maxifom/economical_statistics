@@ -23,8 +23,8 @@
 {#            <td>Percent</td>#}
             <td>Pred.time price</td>
             <td>Prediction</td>
-            {#<td>Created</td>
-            <td>Updated*</td>#}
+{#            <td>Created</td>#}
+            <td>Updated</td>
         </tr>
         </thead>
         <tbody>
@@ -43,8 +43,8 @@
                         <span style="color:lightcoral">{{ "%.5f"|format(prediction.prediction) }} ↓</span>
                     {% endif %}
                 </td>
-                {#<td>{{ prediction.time }}</td>
-                <td>{{ prediction.updated_at }}</td>#}
+{#                <td>{{ prediction.time }}</td>#}
+                <td>{{ prediction.updated_at }}</td>
             </tr>
         {% endfor %}
         </tbody>

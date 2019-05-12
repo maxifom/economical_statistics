@@ -183,7 +183,7 @@ def predictions():
     for c in companies:
         prediction = Prediction.select(Prediction, Company).join(Company).where(
             Prediction.company == c.id).order_by(
-            Prediction.id.desc).limit(1)
+            Prediction.id.desc()).limit(1)
         prediction = prediction[0] if len(prediction) > 0 else None
         if prediction is None:
             continue

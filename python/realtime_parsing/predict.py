@@ -2,7 +2,6 @@
     Calculates parameters for prediction (last 30 days) and predicts the next day closing price
 """
 
-
 import decimal
 import json
 from models import *
@@ -72,7 +71,8 @@ def predict():
             p.mean_overnight_variation) + \
                        cf["log_return"] * float(p.mean_log_return) + cf["close"] * float(p.mean_closing_price)
 
-        results = Prediction.select(Prediction.id, Prediction.prediction).where(Prediction.company == c.id).order_by(
+        results = Prediction.select(Prediction.id, Prediction.prediction).where(
+            (Prediction.company == c.id) & (Prediction.actual == 0)).order_by(
             Prediction.id.desc()).limit(1)
         last_prediction = results[0] if len(results) > 0 else None
         p.current = Price.select(Price.current).where(Price.company == c.id).order_by(Price.id.desc()).limit(
