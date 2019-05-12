@@ -11,16 +11,16 @@
         <a class="btn btn-primary btn-sm" href="/update_actual">Update actual</a>
     </p>
     <h1>Last predictions: </h1>
-    <h4>Linreg: {{ tr }}/{{ l }} ({{ perc }}%)</h4>
-    <div style="display: flex; flex-direction: row;">
+{#    <h4>Linreg: {{ tr }}/{{ l }} ({{ perc }}%)</h4>#}
+    {#<div style="display: flex; flex-direction: row;">
         <div id="myChart"></div>
-    </div>
+    </div>#}
     <br>
     <table class="table table-responsive table-sm table-striped">
         <thead>
         <tr>
             <td>Name</td>
-            <td>Percent</td>
+{#            <td>Percent</td>#}
             <td>Pred.time price</td>
             <td>Prediction</td>
             {#<td>Created</td>
@@ -31,9 +31,9 @@
         {% for prediction in predictions %}
             <tr>
                 <td>{{ prediction.company.name }}</td>
-                <td>{{ prediction.true }}/{{ prediction.count }}
-                    {{ prediction.percent }}%
-                </td>
+{#                <td>{{ prediction.true }}/{{ prediction.count }}#}
+{#                    {{ prediction.percent }}%#}
+{#                </td>#}
 
                 <td>{{ "%.5f"|format(prediction.current) }}</td>
                 <td>
@@ -50,24 +50,24 @@
         </tbody>
     </table>
     {#    <p>* - prediction price not updated since created</p>#}
-
-    <script src="/js/pie-chart.js"></script>
-    <script>
-        var data = [{
-            values: [{{ tr }}, {{ l-tr }}],
-            labels: ['True', 'False'],
-            type: 'pie',
-            name: "Linreg predictions",
-            marker: {
-                colors: ["rgba(19, 136, 8, 0.8)", "rgba(248, 0, 0,0.8)"]
-            }
-        }];
-
-        var layout = {
-            height: 300,
-            width: 300
-        };
-
-        Plotly.newPlot('myChart', data, layout, {responsive: true});
-    </script>
+{##}
+{#    <script src="/js/pie-chart.js"></script>#}
+{#    <script>#}
+{#        var data = [{#}
+{#            values: [{{ tr }}, {{ l-tr }}],#}
+{#            labels: ['True', 'False'],#}
+{#            type: 'pie',#}
+{#            name: "Linreg predictions",#}
+{#            marker: {#}
+{#                colors: ["rgba(19, 136, 8, 0.8)", "rgba(248, 0, 0,0.8)"]#}
+{#            }#}
+{#        }];#}
+{##}
+{#        var layout = {#}
+{#            height: 300,#}
+{#            width: 300#}
+{#        };#}
+{##}
+{#        Plotly.newPlot('myChart', data, layout, {responsive: true});#}
+{#    </script>#}
 {% endblock %}

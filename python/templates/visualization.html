@@ -6,9 +6,8 @@
 
     <script src="/js/plotly-finance.js"></script>
     <script>
-        function drawGraph(csv, name, width, height, labels, vline) {
+        function drawGraph(csv, name, width, height, labels, vline, visible) {
             labels = labels.split(",");
-            console.log(labels);
             Plotly.d3.csv(csv, function (err, rows) {
                 var max = 0.0;
                 var min = 1e9;
@@ -26,6 +25,24 @@
                     "#34d800",
                     "#F30021"
                 ];
+                let updatemenus = [{
+                    buttons: [
+                        {
+                            label: 'Hide',
+                            method: 'restyle',
+                            args: ['visible', 'legendonly']
+                        }, {
+                            label: 'Show',
+                            method: 'restyle',
+                            args: ['visible', true]
+                        }]
+                }];
+                if (visible === "false") {
+                    visible = "legendonly"
+                } else {
+                    visible = true
+                    updatemenus = []
+                }
                 let data = [];
                 for (let i in labels) {
                     let l = labels[i];
@@ -35,7 +52,8 @@
                         name: l,
                         x: unpack(rows, 'date'),
                         y: unpack(rows, l),
-                        line: {color: colors[i]}
+                        line: {color: colors[i]},
+                        visible: visible,
                     };
                     data.push(trace);
                 }
@@ -54,12 +72,14 @@
                         }
                     });
                 }
+
                 let layout = {
                     autosize: false,
                     width: width,
                     height: height,
                     title: name,
                     shapes: shapes,
+                    updatemenus: updatemenus
                 };
                 Plotly.newPlot('graph', data, layout);
             })
@@ -72,12 +92,9 @@
             let name = e.target.getAttribute("name");
             let labels = e.target.getAttribute("labels");
             let vline = e.target.getAttribute("vline");
-            if (vline === "true") {
-                vline = true
-            } else {
-                vline = false;
-            }
-            drawGraph(e.target.getAttribute("href"), name, width, height, labels, vline)
+            vline = vline === "true";
+            let visible = e.target.getAttribute("graph-visible");
+            drawGraph(e.target.getAttribute("href"), name, width, height, labels, vline, visible)
         });
 
         function closeGraph() {
@@ -154,13 +171,14 @@
                     <button disabled>Graph</button>
                 </td>
                 <td>
-                    <button name="All Accuracy" labels="{{ companies_str }}" class="graph-button"
+                    <button graph-visible="false" name="All Accuracy" labels="{{ companies_str }}" class="graph-button"
                             href="/csv/linreg/all_acc.csv">Graph
                     </button>
                 </td>
                 <td>
                     <button disabled>Graph</button>
-                    <button name="All Value Loss %" labels="{{ companies_str }}" class="graph-button"
+                    <button graph-visible="false" name="All Value Loss %" labels="{{ companies_str }}"
+                            class="graph-button"
                             href="/csv/linreg/all_val_loss_pct.csv">(%)
                     </button>
                 </td>
@@ -221,13 +239,14 @@
                     <button disabled>Graph</button>
                 </td>
                 <td>
-                    <button name="All Accuracy" labels="{{ companies_str }}" class="graph-button"
+                    <button graph-visible="false" name="All Accuracy" labels="{{ companies_str }}" class="graph-button"
                             href="/csv/arima/all_acc.csv">Graph
                     </button>
                 </td>
                 <td>
                     <button disabled>Graph</button>
-                    <button name="All Value Loss %" labels="{{ companies_str }}" class="graph-button"
+                    <button graph-visible="false" name="All Value Loss %" labels="{{ companies_str }}"
+                            class="graph-button"
                             href="/csv/arima/all_val_loss_pct.csv">(%)
                     </button>
                 </td>
@@ -286,10 +305,16 @@
                 <td title="{{ means["linreg"]["test_acc"] - means["arima"]["test_acc"] }}">{{ "%.2f" | format((means["linreg"]["test_acc"] - means["arima"]["test_acc"])*100) }}%</td>
                 <td title="{{ means["linreg"]["test_val_loss"]-means["arima"]["test_val_loss"] }}({{ means["linreg"]["test_val_loss_percent"]-means["arima"]["test_val_loss_percent"] }})">{{ "%.4f"|format(means["linreg"]["test_val_loss"]-means["arima"]["test_val_loss"]) }}({{ "%.2f"|format((means["linreg"]["test_val_loss_percent"]-means["arima"]["test_val_loss_percent"])*100) }}%)
                 </td>
-                <td><button disabled>Graph</button></td>
-                <td><button disabled>Graph</button></td>
-                <td><button disabled>Graph</button>
-                    <button disabled>(%)</button></td>
+                <td>
+                    <button disabled>Graph</button>
+                </td>
+                <td>
+                    <button disabled>Graph</button>
+                </td>
+                <td>
+                    <button disabled>Graph</button>
+                    <button disabled>(%)</button>
+                </td>
             </tr>
             </tbody>
 
