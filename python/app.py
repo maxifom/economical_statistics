@@ -5,10 +5,10 @@ from flask import Flask, render_template, request, redirect, make_response, send
 from misc.add_to_dictionary import add_words_from_txt, process_lines, process_line
 from models.models import *
 from realtime_parsing.update_actual import update_predictions
-from flask_compress import Compress
+#from flask_compress import Compress
 
-COMPRESS_LEVEL = 6
-COMPRESS_MIN_SIZE = 500
+#COMPRESS_LEVEL = 6
+#COMPRESS_MIN_SIZE = 500
 app = Flask(__name__)
 
 
